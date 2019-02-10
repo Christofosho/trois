@@ -1,0 +1,69 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    font-family: 'Roboto', sans-serif;
+    font-size: 3em;
+}
+
+.centered {
+    text-align: center;
+}
+
+.hide {
+    display: none;
+}
+.show {
+    display: block;
+}
+
+.row {
+    display: flex;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+}
+
+.justify {
+    justify-content: space-around;
+}
+
+#game {
+    display: flex;
+}
+
+#lobby {
+    display: flex;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.5em;
+}
+
+#cards {
+    flex: 3;
+
+    display: flex;
+    flex-direction: column;
+}
+
+#cards .row {
+    margin-bottom: 10px;
+}
+
+.card {
+    width: 80px;
+    height: 110px;
+    border: 1px solid black;
+    border-radius: 8px;
+}
+
+#players {
+    flex: 1;
+}
+
+.player {
+
+}
