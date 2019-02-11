@@ -32,24 +32,24 @@ h1 {
     justify-content: space-around;
 }
 
-#game {
+.game {
     display: flex;
 }
 
-#lobby {
+.lobby {
     display: flex;
     font-family: 'Roboto', sans-serif;
     font-size: 1.5em;
 }
 
-#cards {
+.cards {
     flex: 3;
 
     display: flex;
     flex-direction: column;
 }
 
-#cards .row {
+.cards .row {
     margin-bottom: 10px;
 }
 
@@ -60,10 +60,14 @@ h1 {
     border-radius: 8px;
 }
 
-#players {
+.players {
     flex: 1;
 }
 
 .player {
 
+}
+
+.controls {
+    justify-content: space-between;
 }

@@ -1,48 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-let user_id = -1;
-
 (() => {
     const socket = new WebSocket('ws://' + document.domain + ':5000/ws');
 
     // Open
     socket.addEventListener('open', (event) => {
+        ReactDOM.render(
+            <Game />,
+            document.querySelector('main')
+        );
         const data = {
             type: "register"
         };
         socket.send(JSON.stringify(data));
-    });
-
-    // Message
-    socket.addEventListener('message', (event) => {
-        const data = JSON.parse(event.data);
-        if (data.type == "register") {
-            // Prior to joining a room, the user
-            // is given an id for updates.
-            user_id = data.user_id;
-            console.log("User ID:", user_id);
-        }
-        // TODO: join_room
-        if (data.type == "join_room") {
-
-        }
-        // TODO: start_game
-        if (data.type == "start_game") {
-            
-        }
-        // TODO: send_action
-        if (data.type == "send_action") {
-            
-        }
-        // TODO: end_game
-        if (data.type == "end_game") {
-            
-        }
-        // TODO: leave_game
-        if (data.type == "leave_game") {
-            
-        }
     });
 
     // Error
@@ -59,120 +30,207 @@ let user_id = -1;
         requestAnimationFrame(main);
     };
 
-    /*
-    socket.on('connect', () => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            socket.emit('authentication', JSON.stringify({
-              'username': document.getElementById('username').value
-            }));
-      });
-    });
-    */
-
     class Card extends React.Component {
         constructor(props) {
             super(props);
             this.state = {
-                button: props.buttonName
+                cardData: props.cardData
             }
         }
 
         render() {
             return (
-                <div class="card">
-                    <span>{this.state.button}</span>
+                <div className="card">
+                    <span>
+                        {this.state.cardData ? this.state.cardData[0]
+                            : -1}
+                    </span>
                 </div>
             );
         }
     }
 
-    function Cards(props) {
-        return (
-            <div id="cards">
-                <div class="row justify">
-                    <Card buttonName={'Q'} />
-                    <Card buttonName={'W'} />
-                    <Card buttonName={'E'} />
-                    <Card buttonName={'R'} />
+    class Cards extends React.Component {
+        constructor (props) {
+            super(props);
+            this.state = {
+                active_cards: this.props.activeCards
+            };
+        }
+
+        render() {
+            return (
+                <div id="cards">
+                    <div className="row justify">
+                        <Card buttonName={'Q'}
+                            cardData={this.state.active_cards[0]} />
+                        <Card buttonName={'W'}
+                            cardData={this.state.active_cards[1]} />
+                        <Card buttonName={'E'}
+                            cardData={this.state.active_cards[2]} />
+                        <Card buttonName={'R'}
+                            cardData={this.state.active_cards[3]} />
+                    </div>
+                    <div className="row justify">
+                        <Card buttonName={'A'}
+                            cardData={this.state.active_cards[4]} />
+                        <Card buttonName={'S'}
+                            cardData={this.state.active_cards[5]} />
+                        <Card buttonName={'D'}
+                            cardData={this.state.active_cards[6]} />
+                        <Card buttonName={'F'}
+                            cardData={this.state.active_cards[7]} />
+                    </div>
+                    <div className="row justify">
+                        <Card buttonName={'Z'}
+                            cardData={this.state.active_cards[8]} />
+                        <Card buttonName={'X'}
+                            cardData={this.state.active_cards[9]} />
+                        <Card buttonName={'C'}
+                            cardData={this.state.active_cards[10]} />
+                        <Card buttonName={'V'}
+                            cardData={this.state.active_cards[11]} />
+                    </div>
                 </div>
-                <div class="row justify">
-                    <Card buttonName={'A'} />
-                    <Card buttonName={'S'} />
-                    <Card buttonName={'D'} />
-                    <Card buttonName={'F'} />
+            );
+        }
+    }
+
+    class Player extends React.Component {
+        constructor(props) {
+            super(props);
+        }
+
+        render() {
+            return (
+                <div className="player">
+                    <div className="player-name">
+                        {this.props.playerName}
+                    </div>
+                    <div className="player-score">
+                        {this.props.playerScore}
+                    </div>
                 </div>
-                <div class="row justify">
-                    <Card buttonName={'Z'} />
-                    <Card buttonName={'X'} />
-                    <Card buttonName={'C'} />
-                    <Card buttonName={'V'} />
-                </div>
-            </div>
-        );
+            );
+        }
     }
 
     class Players extends React.Component {
         constructor(props) {
             super(props);
             this.state = {
-                active: {}
+                active: props.players
             };
         }
 
         render() {
-            let players = [];
+            let activePlayers = [];
             for (const k in this.state.active) {
                 if (this.state.active.hasOwnProperty(k)) {
-                    players.push(<Player
-                        playerName={this.state.active[k].playerName}
-                        playerScore={this.state.active[k].playerScore}
-                    />);
+                    activePlayers.push(<Player key={k}
+                        playerName={this.state.active[k]['name']}
+                        playerScore={this.state.active[k]['score']} />);
                 }
             }
             return (
-                <aside id="players">
-                    {players}
+                <aside className="players">
+                    {activePlayers}
                 </aside>
             );
         }
     }
 
-    function Room(props) {
-        return (
-            <div id="room">
-                <Cards />
-                <Players />
-            </div>
-        );
+    class Controls extends React.Component {
+        constructor (props) {
+            super(props);
+
+            this.leaveRoom = this.leaveRoom.bind(this);
+            this.startRoom = this.startRoom.bind(this);
+        }
+
+        leaveRoom(event) {
+            socket.send(JSON.stringify({
+                type: "leave_room",
+                user_id: this.props.userId
+            }));
+        }
+
+        startRoom(event) {
+            socket.send(JSON.stringify({
+                type: "start_room",
+                user_id: this.props.userId,
+                room_id: this.props.roomId
+            }))
+        }
+
+        render() {
+            return (
+                <div className="controls row">
+                    <button className="leave-room" onClick={this.leaveRoom}>
+                        Leave Room
+                    </button>
+                    <button className="start-room" onClick={this.startRoom}>
+                        Start Game
+                    </button>
+                </div>
+            );
+        }
+    }
+
+    class Room extends React.Component {
+        constructor (props) {
+            super(props);
+            this.state = {
+                players: this.props.players,
+                active_cards: this.props.activeCards
+            }
+        }
+
+        render() {
+            return (
+                <div className="room column">
+                    <div className="row">
+                        <Cards activeCards={this.state.active_cards} />
+                        <Players players={this.state.players} />
+                    </div>
+                    <div className="row">
+                        <Controls userId={this.props.userId}
+                                  roomId={this.props.roomId} />
+                    </div>
+                </div>
+            );
+        }
     }
 
     class Lobby extends React.Component {
         constructor (props) {
             super(props);
+
+            this.sendNewRoom = this.sendNewRoom.bind(this);
         }
 
-        sendNewGame() {
+        sendNewRoom(e) {
             const data = {
-                type: 'new_game',
-                user_id: user_id,
-
+                type: 'new_room',
+                user_id: this.props.userId,
             }
-            console.log("Sending data:", data);
-            socket.send(data);
+            socket.send(JSON.stringify(data));
         };
 
         render() {
             return (
-                <div id="lobby" class="column">
+                <div id="lobby" className="column">
                     <div>
                         <p>Start a new game:</p>
-                        <button id="new" onClick={this.sendNewGame}>New</button>
+                        <button id="new" onClick={this.sendNewRoom}>
+                            New
+                        </button>
                     </div>
                     <hr/>
                     <div>
-                        <label for="join">Join a game:</label>
-                        <input id="join" type="textbox" placeholder="Room ID"></input>
+                        <label htmlFor="join">Join a game:</label>
+                        <input id="join" type="textbox"
+                            placeholder="Room ID"></input>
                         <button id="join">Join</button>
                     </div>
                 </div>
@@ -184,25 +242,72 @@ let user_id = -1;
         constructor(props) {
             super(props);
             this.state = {
-                mode: 0
+                user_id: -1,
+                mode: 0,
+                room: {}
             };
+
+            this.socketMessageHandler = this.socketMessageHandler.bind(this);
+        }
+
+        socketMessageHandler(event) {
+            const data = JSON.parse(event.data);
+            if (data.type == "register") {
+                // Prior to joining a room, the user
+                // is given an id for updates.
+                this.setState({
+                    user_id: data.user_id
+                });
+            }
+
+            else if (data.type == "join_room") {
+                this.setState({
+                    mode: 1,
+                    room: data.room
+                });
+            }
+            // TODO: start_game
+            else if (data.type == "start_room") {
+                this.setState({
+                    mode: 2,
+                    room: data.room
+                });
+            }
+            // TODO: send_action
+            else if (data.type == "send_action") {
+                
+            }
+            // TODO: end_game
+            else if (data.type == "end_room") {
+                
+            }
+            // TODO: leave_game
+            else if (data.type == "leave_room") {
+                
+            }
+        }
+
+        componentDidMount() {
+            // Message
+            socket.addEventListener('message', this.socketMessageHandler);
+        }
+
+        componentWillUnmount() {
+            socket.removeEventListener('message', this.socketMessageHandler);
         }
 
         render() {
-            let mode = <Lobby />;
-            if (this.state.mode == 1) {
-                mode = <Room />;
-            }
             return (
-                <div id="game" class="justify">
-                    {mode}
+                <div id="game" className="row justify">
+                    {this.state.mode >= 1 ?
+                        <Room userId={this.state.user_id}
+                              roomId={this.state.room.room_id}
+                              players={this.state.room.players}
+                              activeCards={this.state.room.active_cards}
+                        />
+                        : <Lobby userId={this.state.user_id} />}
                 </div>
             );
         }
     }
-
-    ReactDOM.render(
-        <Game />,
-        document.querySelector('main')
-    );
 })();

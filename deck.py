@@ -17,7 +17,11 @@ class Deck():
     ]
 
     def __init__(self):
-        self.current = random.shuffle(list(self.cards))
+        self.current = list(zip(
+            list(range(len(self.cards))),
+            list(self.cards)
+        ))
+        random.shuffle(self.current)
 
     def draw(self):
         """ Return a card from the current deck. """

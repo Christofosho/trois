@@ -2,19 +2,29 @@
 class Validator():
     valid_message_types = set([
         "register",
+        "unregister",
+        "new_room",
         "join_room",
-        "start_game",
+        "start_room",
         "send_action",
-        "end_game",
-        "leave_game"
+        "end_room",
+        "leave_room"
     ])
 
-    def __init__(self):
-        pass
+    def __init__(self, handler):
+        self.handler = handler
 
     def validate_message_type(self, message_type):
-        if message_type in self.valid_message_types:
-            return message_type
+        if message_type and (message_type in self.valid_message_types):
+            return True
+        return False
 
-        return None
+    def validate_user_id(self, user_id):
+        if user_id and (user_id in self.handler.users):
+            return True
+        return False
     
+    def validate_room_id(self, room_id):
+        if room_id and room_id in self.handler.rooms:
+            return True
+        return False

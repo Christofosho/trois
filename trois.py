@@ -22,8 +22,13 @@ class EchoServerProtocol(WebSocketServerProtocol):
     def onMessage(self, payload, isBinary):
         try:
             payload = json.loads(payload)
-            data = handler.distribute(payload)
-            self.sendMessage(json.dumps(data).encode('utf8'))
+            data = handler.distribute(self, payload)
+            if data:
+                print("Sending data: {}".format(data))
+                self.sendMessage(json.dumps(data).encode('utf8'))
+
+        except Exception as e:
+            raise e
 
         except:
             import sys
@@ -33,8 +38,17 @@ class EchoServerProtocol(WebSocketServerProtocol):
             tb_info = traceback.extract_tb(tb)
             filename, line, func, text = tb_info[-1]
 
-            print('An error occurred on line {} in statement {}'.format(line, text))
-
+            print('An error occurred on line {} in statement {}'.format(
+                line, text
+            ))
+        
+    def onClose(self, wasClean, code, reason):
+        print("Removing user: {}".format(self.user_id))
+        handler.distribute(self, {
+            'message_type': "unregister",
+            'user_id': self.user_id
+        })
+        self.factory.unregister(self)
 
 
 class BroadcastServerFactory(WebSocketServerFactory):
