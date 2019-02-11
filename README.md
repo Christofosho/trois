@@ -7,6 +7,10 @@ In the game of Trois, there are many groups of three. There are three different 
 1. Draw 12 cards from the deck and place them face up in 3 rows of 4.
 2. Look for groups of three cards that have all but one feature matching. Example:
 
+  Card 1: 3 Purple Filled Triangles
+  Card 2: 3 Purple Filled Squares
+  Card 3: 3 Purple Filled Circles
+
 ## Installing
 1. Clone the repo.
 2. `cd trois`
@@ -16,6 +20,5 @@ In the game of Trois, there are many groups of three. There are three different 
 6. `npm install`
 
 ## Running
-1. Terminal One: `npm start`
-2. Terminal Two: `python trois.py`
-3. Navigate to `localhost:5000` on your browser.
+1. In the project folder: `python trois.py`
+2. Navigate to `localhost:5000` on your browser.
