@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   devtool: 'eval-source-map',
-  entry: "./public/index.js",
+  entry: "./public/js/index.js",
   output: {
     filename: "bundle.js",
     path: path.resolve(__dirname, "public")

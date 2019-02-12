@@ -291,6 +291,8 @@ class Handler():
                 [self.rooms[room_id]['deck'].draw() for _ in range(3)]
             )
 
+            self.rooms[room_id]['active_cards'] = active_cards
+
         return {
             "type": "send_action",
             "success": success,
