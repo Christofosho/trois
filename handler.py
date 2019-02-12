@@ -278,14 +278,13 @@ class Handler():
         success = self.check_cards(card_defs)
         if success:
             # Give the player a point
-            self.rooms[room_id]['active_players'][user_id]['score'] += 1
+            self.rooms[room_id]['players'][user_id]['score'] += 1
 
             # Remove the three cards picked
-            active_cards = self.rooms[room_id]['active_cards']
-
-            for i, card in enumerate(active_cards[:]):
-                if card[0] in cards:
-                    active_cards.pop(i)
+            active_cards = [
+                card for card in self.rooms[room_id]['active_cards']
+                if card[0] not in cards
+            ]
 
             # Draw three more cards
             active_cards.extend(

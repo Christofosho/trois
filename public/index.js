@@ -31,15 +31,18 @@ class Card extends React.Component {
     }
 
     render() {
-        let val = this.props.cardData > -1 ? this.props.cardData : -1
+        let val = this.props.cardData > -1 ? this.props.cardData : -1;
+        let bg = ((this.props.cardData > -1) ? { 
+            background: 'url(shapes.png) no-repeat -'
+                + ((this.props.cardData % 9) * 56)
+                + 'px -'
+                + (Math.floor(this.props.cardData / 9) * 89)
+                + 'px'
+        } : {});
         return (
             <div className="card">
-                <div className={
-                        this.props.selected ? " active-card" : null
-                    } onClick={this.props.onClick}>
-                    <span>
-                        {val}
-                    </span>
+                <div style={bg} className={this.props.selected ? "active-card" : ""}
+                    onClick={this.props.onClick}>
                 </div>
             </div>
         );

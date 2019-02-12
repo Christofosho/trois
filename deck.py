@@ -11,8 +11,8 @@ class Deck():
             'fill': fill
         }
         for fill in range(3)
-        for colour in range(3)
         for count in range(3)
+        for colour in range(3)
         for shape in range(3)
     ]
 
