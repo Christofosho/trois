@@ -23,8 +23,18 @@ class Validator():
         if user_id and (user_id in self.handler.users):
             return True
         return False
-    
+
     def validate_room_id(self, room_id):
-        if room_id and room_id in self.handler.rooms:
+        if room_id and (room_id in self.handler.rooms):
             return True
         return False
+
+    def validate_cards(self, room_id, cards):
+        if not isinstance(cards, list):
+            return False
+
+        matches = 0
+        for card in range(len(self.handler.rooms[room_id]['deck'].cards)):
+            if card in cards:
+                matches += 1
+        return matches == 3

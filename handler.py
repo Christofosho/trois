@@ -62,23 +62,29 @@ class Handler():
         valid_room = self.validator.validate_room_id(room_id)
         if not valid_room:
             # TODO: Handle error.
+            print("Invalid room_id for user: {}".format(user_id))
             return
 
         # TODO: join_room
         if message_type == "join_room":
             pass
 
-        # TODO: start_room
         elif message_type == "start_room":
             return self.start_room(user_id, room_id)
 
         # TODO: send_action
         elif message_type == "send_action":
-            return self.handle_action()
+            cards = payload.get("cards", None)
+            valid_cards = self.validator.validate_cards(room_id, cards)
+            if valid_cards:
+                return self.handle_action(user_id, room_id, cards)
+
+        elif message_type == "no_matches":
+            pass
 
         # TODO: end_room
         elif message_type == "end_room":
-            return self.end_room()
+            return self.end_room(room_id)
 
         # TODO: leave_room
         elif message_type == "leave_room":
@@ -102,8 +108,7 @@ class Handler():
 
         # Set to None until a room is assigned.
         self.users[user_id] = {
-            'room_id': None,
-            'score': 0
+            'room_id': None
         }
         return user_id
 
@@ -180,22 +185,22 @@ class Handler():
                 self.remove_user_from_room(user_id, room_id)
 
         active_players = len(self.rooms[room_id]['players'])
-        fake_name = "Player One"
+        fake_name = "Player 1"
         if active_players == 1:
-            fake_name = "Player Two"
+            fake_name = "Player 2"
 
         elif active_players == 2:
-            fake_name = "Player Three"
+            fake_name = "Player 3"
 
         elif active_players == 3:
-            fake_name = "Player Three"
+            fake_name = "Player 4"
 
         elif active_players > 3:
             return False
 
         self.rooms[room_id]['players'][user_id] = {
             'name': fake_name,
-            'score': self.users[user_id]['score']
+            'score': 0
         }
         self.users[user_id]['room_id'] = room_id
 
@@ -207,10 +212,6 @@ class Handler():
             user_id: uuid
             room_id: string of random characters
         """
-        if not self.check_user_and_room(user_id, room_id):
-            # TODO: Handle error.
-            return
-
         del self.rooms[room_id]['players'][user_id]
 
     def can_join_room(self, user_id, room_id):
@@ -220,9 +221,6 @@ class Handler():
             user_id: uuid
             room_id: string of random characters
         """
-        if not self.check_user_and_room(user_id, room_id):
-            return False
-
         room = self.rooms[room_id]
 
         if room['game_stage'] != 0:
@@ -242,10 +240,6 @@ class Handler():
             user_id: uuid
             room_id: string of random characters
         """
-        if not self.check_user_and_room(user_id, room_id):
-            # TODO: Handle error.
-            return
-
         self.rooms[room_id]['game_stage'] = 1
         self.rooms[room_id]['active_cards'] = [
             self.rooms[room_id]['deck'].draw()
@@ -257,15 +251,71 @@ class Handler():
             "room": {
                 'room_id': room_id,
                 'players': self.rooms[room_id]['players'],
-                'active_cards': self.rooms[room_id]['active_cards']
+                'active_cards': [
+                    c[0] for c in self.rooms[room_id]['active_cards']
+                ]
             }
         }
 
-    def check_user_and_room(self, user_id, room_id):
-        if user_id not in self.users:
-            return False
+    def leave_room(self, user_id):
+        """ Remove user from room.
 
-        if room_id not in self.rooms:
-            return False
+            user_id: uuid
+        """
+        room_id = self.users[user_id]['room_id']
+        self.remove_user_from_room(user_id, room_id)
+        # TODO: Update other users.
+        return {
+            "type": "leave_room"
+        }
 
-        return True
+    def handle_action(self, user_id, room_id, cards):
+        # Get card definitions
+        card_defs = [
+            card for card in self.rooms[room_id]['active_cards']
+            if card[0] in cards
+        ]
+        success = self.check_cards(card_defs)
+        if success:
+            # Give the player a point
+            self.rooms[room_id]['active_players'][user_id]['score'] += 1
+
+            # Remove the three cards picked
+            active_cards = self.rooms[room_id]['active_cards']
+
+            for i, card in enumerate(active_cards[:]):
+                if card[0] in cards:
+                    active_cards.pop(i)
+
+            # Draw three more cards
+            active_cards.extend(
+                [self.rooms[room_id]['deck'].draw() for _ in range(3)]
+            )
+
+        return {
+            "type": "send_action",
+            "success": success,
+            "room": {
+                'room_id': room_id,
+                'players': self.rooms[room_id]['players'],
+                'active_cards': [
+                    c[0] for c in self.rooms[room_id]['active_cards']
+                ]
+            }
+        }
+
+    def check_cards(self, cards):
+        # Match cards
+        match = 0
+        for card in cards[1:]:
+            same = 0
+            for k, v in card[1].items():
+                if cards[0][1][k] == v:
+                    same += 1
+
+            if same == 3:
+                match += 1
+            elif same == 0:
+                match -= 1
+
+        return match == 2 or match == -2

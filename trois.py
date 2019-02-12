@@ -22,10 +22,16 @@ class EchoServerProtocol(WebSocketServerProtocol):
     def onMessage(self, payload, isBinary):
         try:
             payload = json.loads(payload)
+            if "type" in payload and payload["type"] == "ping":
+                return
+
             data = handler.distribute(self, payload)
             if data:
                 print("Sending data: {}".format(data))
                 self.sendMessage(json.dumps(data).encode('utf8'))
+            else:
+                print("Invalid data: {}".format(data))
+                print("Payload was: {}".format(payload))
 
         except Exception as e:
             raise e
