@@ -33,11 +33,9 @@ class Card extends React.Component {
     render() {
         let val = this.props.cardData > -1 ? this.props.cardData : -1;
         let bg = ((this.props.cardData > -1) ? { 
-            background: 'url(shapes.png) no-repeat -'
-                + ((this.props.cardData % 9) * 56)
-                + 'px -'
-                + (Math.floor(this.props.cardData / 9) * 89)
-                + 'px'
+            background: `url(shapes.png) no-repeat -${
+                (this.props.cardData % 9) * 56}px -${
+                Math.floor(this.props.cardData / 9) * 89}px`
         } : {});
         return (
             <div className="card">

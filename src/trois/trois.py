@@ -10,7 +10,7 @@ from twisted.python import log
 from twisted.web.server import Site
 from twisted.web.static import File
 
-from handler import Handler
+from trois.handler import Handler
 
 handler = Handler()
 
@@ -70,7 +70,8 @@ class BroadcastServerFactory(WebSocketServerFactory):
         if client in self.clients:
             self.clients.remove(client)
 
-if __name__ == '__main__':
+
+def run_server():
     log.startLogging(sys.stdout)
     factory = BroadcastServerFactory(u"ws://127.0.0.1:5000")
     factory.protocol = EchoServerProtocol
@@ -80,3 +81,6 @@ if __name__ == '__main__':
     site = Site(root)
     reactor.listenTCP(5000, site)
     reactor.run()
+
+if __name__ == "__main__":
+    run_server()

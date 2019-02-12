@@ -1,8 +1,8 @@
 import random
 import string
 import uuid
-from deck import Deck
-from validator import Validator
+from trois.deck import Deck
+from trois.validator import Validator
 
 
 class Handler():
@@ -306,15 +306,22 @@ class Handler():
     def check_cards(self, cards):
         # Match cards
         match = 0
-        for card in cards[1:]:
-            same = 0
-            for k, v in card[1].items():
-                if cards[0][1][k] == v:
-                    same += 1
+        card1 = cards[0][1]
+        card2 = cards[1][1]
+        card3 = cards[2][1]
 
-            if same == 3:
-                match += 1
-            elif same == 0:
-                match -= 1
+        match += self.compare_element(card1, card2, card3, 'shape')
+        match += self.compare_element(card1, card2, card3, 'colour')
+        match += self.compare_element(card1, card2, card3, 'count')
+        match += self.compare_element(card1, card2, card3, 'fill')
 
-        return match == 2 or match == -2
+        return match == 4
+
+    def compare_element(self, card1, card2, card3, element):
+        e1 = card1[element]
+        e2 = card2[element]
+        e3 = card3[element]
+        if (e1 == e2 and e2 == e3) or (e1 != e2 and e1 != e3 and e2 != e3):
+            # All the same or all different
+            return 1
+        return 0
