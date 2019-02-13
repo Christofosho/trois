@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Lobby from './lobby';
+import Message from './message';
 import Room from './room';
 
 import {socket} from '../index';
@@ -11,6 +12,10 @@ export default class Game extends React.Component {
         this.state = {
             user_id: -1,
             mode: 0,
+            message: [
+                "Welcome to Trois",
+                "The game of shapes and matching three!"
+            ],
             room: {}
         };
 
@@ -23,7 +28,14 @@ export default class Game extends React.Component {
             request sent to the server.
         */
         const data = JSON.parse(event.data);
-        if (data.type == "register") {
+
+        if (data.message) {
+            this.setState({
+                message: data.message
+            });
+        }
+
+        if (data.response_type == "register") {
             // Prior to joining a room, the user
             // is given an id for updates.
             this.setState({
@@ -31,33 +43,52 @@ export default class Game extends React.Component {
             });
         }
 
-        else if (data.type == "join_room") {
+        else if (data.response_type == "join_room") {
             this.setState({
                 mode: 1,
                 room: data.room
             });
         }
 
-        else if (data.type == "start_room") {
+        else if (data.response_type == "start_room") {
             this.setState({
                 mode: 2,
                 room: data.room
             });
         }
 
-        else if (data.type == "send_action") {
+        else if (data.response_type == "send_action") {
             if (data.success) {
                 this.setState({
                     room: data.room
                 });
             }
         }
+
+        else if (data.response_type == "no_matches") {
+            if (data.success) {
+                this.setState((state) => ({
+                    room: Object.assign(state.room, {
+                        'active_cards': data.active_cards
+                    })
+                }));
+            }
+
+            if (data.message) {
+
+            }
+        }
         // TODO: end_room
-        else if (data.type == "end_room") {
-            
+        else if (data.response_type == "end_room") {
+            if (data.success) {
+                this.setState({
+                    mode: 1,
+                    room: data.room
+                })
+            }
         }
 
-        else if (data.type == "leave_room") {
+        else if (data.response_type == "leave_room") {
             this.setState({
                 mode: 0,
                 room: {}
@@ -76,7 +107,8 @@ export default class Game extends React.Component {
 
     render() {
         return (
-            <div className="game row justify">
+            <div className="game column">
+                <Message messages={this.state.message} />
                 {this.state.mode >= 1 ?
                     <Room mode={this.state.mode}
                         userId={this.state.user_id}

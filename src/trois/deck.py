@@ -23,6 +23,9 @@ class Deck():
         ))
         random.shuffle(self.current)
 
+    def __len__(self):
+        return len(self.current)
+
     def draw(self):
         """ Return a card from the current deck. """
         return self.current.pop() if len(self.current) > 0 else None

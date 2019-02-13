@@ -25,6 +25,12 @@ export default class Cards extends React.Component {
                         .concat([cardValue])
                 }));
             }
+            else {
+                this.setState((state) => ({
+                    selected_cards:
+                        state.selected_cards.filter(x => x !== cardValue)
+                }));
+            }
         }
     }
 
@@ -32,7 +38,7 @@ export default class Cards extends React.Component {
         if (pState.selected_cards.length !== this.state.selected_cards.length
             && this.state.selected_cards.length == 3) {
             socket.send(JSON.stringify({
-                type: "send_action",
+                message_type: "send_action",
                 user_id: this.props.userId,
                 room_id: this.props.roomId,
                 cards: this.state.selected_cards
@@ -56,7 +62,7 @@ export default class Cards extends React.Component {
         });
 
         return (
-            <div className="cards row">
+            <div className="cards row justify">
                 {active}
             </div>
         );

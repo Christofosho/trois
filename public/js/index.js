@@ -12,7 +12,7 @@ socket.addEventListener('open', (event) => {
         document.querySelector('main')
     );
     const data = {
-        type: "register"
+        message_type: "register"
     };
     socket.send(JSON.stringify(data));
 });

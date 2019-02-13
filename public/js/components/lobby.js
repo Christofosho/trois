@@ -10,7 +10,7 @@ export default class Lobby extends React.Component {
 
     sendNewRoom(e) {
         const data = {
-            type: 'new_room',
+            message_type: 'new_room',
             user_id: this.props.userId,
         }
         socket.send(JSON.stringify(data));
@@ -18,19 +18,17 @@ export default class Lobby extends React.Component {
 
     render() {
         return (
-            <div id="lobby" className="column">
-                <div className="row">
-                    <p>Start a new room:</p>
+            <div className="lobby column">
+                <div className="center">
                     <button className="new-room" onClick={this.sendNewRoom}>
-                        New
+                        New Room
                     </button>
                 </div>
                 <hr/>
-                <div>
-                    <label htmlFor="join">Join a room:</label>
+                <div className="column">
                     <input id="join" className="join-room-input"
                         type="textbox" placeholder="Room ID"></input>
-                    <button className="join-room-button">Join</button>
+                    <button className="join-room-button">Join Room</button>
                 </div>
             </div>
         );

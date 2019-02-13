@@ -13,9 +13,11 @@ export default class Room extends React.Component {
         return (
             <div className="room column">
                 <div className="row justify">
+                    { this.props.mode >= 2 ?
                     <Cards userId={this.props.userId}
                         roomId={this.props.roomId}
                         activeCards={this.props.activeCards} />
+                    : null }
                     <Players players={this.props.players} />
                 </div>
                 <Controls mode={this.props.mode}

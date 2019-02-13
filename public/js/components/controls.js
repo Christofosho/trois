@@ -9,11 +9,12 @@ export default class Controls extends React.Component {
         this.leaveRoom = this.leaveRoom.bind(this);
         this.startRoom = this.startRoom.bind(this);
         this.noMatches = this.noMatches.bind(this);
+        this.endRoom = this.endRoom.bind(this);
     }
 
     leaveRoom(event) {
         socket.send(JSON.stringify({
-            type: "leave_room",
+            message_type: "leave_room",
             user_id: this.props.userId,
             room_id: this.props.roomId
         }));
@@ -21,7 +22,7 @@ export default class Controls extends React.Component {
 
     startRoom(event) {
         socket.send(JSON.stringify({
-            type: "start_room",
+            message_type: "start_room",
             user_id: this.props.userId,
             room_id: this.props.roomId
         }))
@@ -29,10 +30,18 @@ export default class Controls extends React.Component {
 
     noMatches(event) {
         socket.send(JSON.stringify({
-            type: "no_matches",
+            message_type: "no_matches",
             user_id: this.props.userId,
             room_id: this.props.roomId
         }));
+    }
+
+    endRoom(event) {
+        socket.send(JSON.stringify({
+            message_type: "end_room",
+            user_id: this.props.userId,
+            room_id: this.props.roomId
+        }))
     }
 
     render() {
@@ -43,11 +52,17 @@ export default class Controls extends React.Component {
                 </button>
                 {this.props.mode === 1 ?
                     <button className="start-room" onClick={this.startRoom}>
-                        Start Game
+                        Start Room
                     </button>
-                    : <button className="no-matches" onClick={this.noMatches}>
+                :
+                <React.Fragment>
+                    <button className="no-matches" onClick={this.noMatches}>
                         No Matches
                     </button>
+                    <button className="end-room" onClick={this.endRoom}>
+                        End Room
+                    </button>
+                </React.Fragment>
                 }
             </div>
         );

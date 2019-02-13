@@ -6,6 +6,7 @@ class Validator():
         "new_room",
         "join_room",
         "start_room",
+        "no_matches",
         "send_action",
         "end_room",
         "leave_room"

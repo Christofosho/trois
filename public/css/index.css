@@ -15,6 +15,10 @@ h1 {
     text-align: center;
 }
 
+.center {
+    margin: 0 auto;
+}
+
 .hide {
     display: none;
 }
@@ -36,17 +40,64 @@ h1 {
 }
 
 .game {
-    display: flex;
+    margin: 0 auto;
     padding: 0 10px;
+    align-items: center;
+    max-width: 740px;
+}
+
+.messages {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+h2.message {
+    font-size: 1.6em;
+    font-weight: 700;
+    margin-top: 0px;
+    margin-bottom: 10px;
+}
+
+.message {
+    font-size: 1.4em;
 }
 
 .lobby {
     display: flex;
-    font-size: 1.5em;
+}
+
+.lobby hr {
+    width: 100%;
+    margin: 16px 0;
+}
+
+.new-room, .join-room-button, .start-room,
+.end-room, .leave-room, .no-matches {
+    width: 116px;
+    height: 34px;
+    border: 1px solid darkgray;
+    border-radius: 5px;
+    padding: 0 4px;
+
+    font-size: 1.1em;
+}
+
+.join-room-input {
+    width: 106px;
+    height: 34px;
+    margin-bottom: 5px;
+    padding: 4px;
+    border: 1px solid darkgray;
+    border-radius: 5px;
+
+    font-size: 1.2em;
 }
 
 .cards {
     flex-wrap: wrap;
+    border: 5px outset black;
+    border-radius: 10px;
+    padding: 5px;
 }
 
 .card {
@@ -68,11 +119,15 @@ h1 {
 }
 
 .players {
-    min-width: 80px;
+    min-width: 90px;
+    border: 5px outset black;
+    border-radius: 10px;
+    padding: 5px;
 }
 
 .player {
     justify-content: space-between;
+    font-size: 1.2em;
 }
 
 .player-name:after {
@@ -81,4 +136,5 @@ h1 {
 
 .controls {
     justify-content: center;
+    margin-top: 10px;
 }
