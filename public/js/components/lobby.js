@@ -5,22 +5,33 @@ import {socket} from '../index';
 export default class Lobby extends React.Component {
     constructor (props) {
         super(props);
-        this.sendNewRoom = this.sendNewRoom.bind(this);
+        this.newRoom = this.newRoom.bind(this);
+        this.joinRoom = this.joinRoom.bind(this);
     }
 
-    sendNewRoom(e) {
-        const data = {
+    newRoom(e) {
+        socket.send(JSON.stringify({
             message_type: 'new_room',
             user_id: this.props.userId,
+        }));
+    }
+
+    joinRoom(e) {
+        const val = document.querySelector('.join-room-input').value;
+        if (val.length == 8) {
+            socket.send(JSON.stringify({
+                message_type: 'join_room',
+                user_id: this.props.userId,
+                room_id: val
+            }));
         }
-        socket.send(JSON.stringify(data));
-    };
+    }
 
     render() {
         return (
             <div className="lobby column">
                 <div className="center">
-                    <button className="new-room" onClick={this.sendNewRoom}>
+                    <button className="new-room" onClick={this.newRoom}>
                         New Room
                     </button>
                 </div>
@@ -28,7 +39,7 @@ export default class Lobby extends React.Component {
                 <div className="column">
                     <input id="join" className="join-room-input"
                         type="textbox" placeholder="Room ID"></input>
-                    <button className="join-room-button">Join Room</button>
+                    <button className="join-room-button" onClick={this.joinRoom}>Join Room</button>
                 </div>
             </div>
         );

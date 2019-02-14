@@ -16,59 +16,44 @@ handler = Handler()
 
 
 class EchoServerProtocol(WebSocketServerProtocol):
-    def onOpen(self):
-        self.factory.register(self)
-
     def onMessage(self, payload, isBinary):
         try:
-            payload = json.loads(payload)
-            if "type" in payload and payload["type"] == "ping":
-                return
+            data = handler.distribute(self, json.loads(payload))
+            if data.broadcast:
+                self.factory.broadcast(data)
 
-            data = handler.distribute(self, payload)
-            if data:
-                print("Sending data: {}".format(data))
-                self.sendMessage(json.dumps(data).encode('utf8'))
             else:
-                print("Invalid data: {}".format(data))
-                print("Payload was: {}".format(payload))
+                self.sendMessage(data.to_json_utf8())
 
         except Exception as e:
             raise e
 
-        except:
-            import sys
-            import traceback
-            tb = sys.exc_info()[2]
-            traceback.print_tb(tb)
-            tb_info = traceback.extract_tb(tb)
-            filename, line, func, text = tb_info[-1]
-
-            print('An error occurred on line {} in statement {}'.format(
-                line, text
-            ))
-        
     def onClose(self, wasClean, code, reason):
         print("Removing user: {}".format(self.user_id))
         handler.distribute(self, {
             'message_type': "unregister",
             'user_id': self.user_id
         })
-        self.factory.unregister(self)
+        self.factory.unregister(self.user_id)
 
 
 class BroadcastServerFactory(WebSocketServerFactory):
     def __init__(self, url):
         WebSocketServerFactory.__init__(self, url)
-        self.clients = []
+        self.clients = {}
 
-    def register(self, client):
+    def register(self, client_id, client):
         if client not in self.clients:
-            self.clients.append(client)
+            self.clients[client_id] = client
 
-    def unregister(self, client):
-        if client in self.clients:
-            self.clients.remove(client)
+    def unregister(self, client_id):
+        if client_id in self.clients:
+            del self.clients[client_id]
+
+    def broadcast(self, data):
+        for user_id in data.payload['room']['players'].keys():
+            if user_id in self.clients:
+                self.clients[user_id].sendMessage(data.to_json_utf8())
 
 
 def run_server():
@@ -81,6 +66,7 @@ def run_server():
     site = Site(root)
     reactor.listenTCP(5000, site)
     reactor.run()
+
 
 if __name__ == "__main__":
     run_server()

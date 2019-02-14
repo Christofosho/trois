@@ -8,9 +8,9 @@ export default class Message extends React.Component {
     render() {
         let messages = Object.entries(this.props.messages).map((val, i) => {
             if (i === 0) {
-                return <h2 className="message">{val[1]}</h2>
+                return <h2 key={i} className="message">{val[1]}</h2>
             }
-            return <div className="message">
+            return <div key={i} className="message">
                 {val[1]}
             </div>
         });

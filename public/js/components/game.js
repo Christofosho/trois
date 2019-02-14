@@ -28,67 +28,41 @@ export default class Game extends React.Component {
             request sent to the server.
         */
         const data = JSON.parse(event.data);
-
-        if (data.message) {
+        if (data.payload.message) {
             this.setState({
-                message: data.message
+                message: data.payload.message
             });
         }
 
-        if (data.response_type == "register") {
+        if (data.message_type == "register") {
             // Prior to joining a room, the user
             // is given an id for updates.
             this.setState({
-                user_id: data.user_id
+                user_id: data.payload.user_id
             });
         }
 
-        else if (data.response_type == "join_room") {
+        else if (data.message_type == "init_room") {
             this.setState({
                 mode: 1,
-                room: data.room
+                room: data.payload.room
             });
         }
 
-        else if (data.response_type == "start_room") {
+        else if (data.message_type == "start_room") {
             this.setState({
                 mode: 2,
-                room: data.room
+                room: data.payload.room
             });
         }
 
-        else if (data.response_type == "send_action") {
-            if (data.success) {
-                this.setState({
-                    room: data.room
-                });
-            }
+        else if (data.message_type == "update_room") {
+            this.setState({
+                room: data.payload.room
+            });
         }
 
-        else if (data.response_type == "no_matches") {
-            if (data.success) {
-                this.setState((state) => ({
-                    room: Object.assign(state.room, {
-                        'active_cards': data.active_cards
-                    })
-                }));
-            }
-
-            if (data.message) {
-
-            }
-        }
-        // TODO: end_room
-        else if (data.response_type == "end_room") {
-            if (data.success) {
-                this.setState({
-                    mode: 1,
-                    room: data.room
-                })
-            }
-        }
-
-        else if (data.response_type == "leave_room") {
+        else if (data.message_type == "leave_room") {
             this.setState({
                 mode: 0,
                 room: {}
