@@ -39,13 +39,13 @@ class ServerProtocol(WebSocketServerProtocol):
 
 def run_server():
     log.startLogging(sys.stdout)
-    factory = WebSocketServerFactory(u"ws://127.0.0.1:5000")
+    factory = WebSocketServerFactory(u"ws://127.0.0.1:8080")
     factory.protocol = ServerProtocol
     resource = WebSocketResource(factory)
     root = File("./public/")
     root.putChild(b"ws", resource)
     site = Site(root)
-    reactor.listenTCP(5000, site)
+    reactor.listenTCP(8080, site)
     reactor.run()
 
 

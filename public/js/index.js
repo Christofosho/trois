@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 import Game from './components/game';
 
-const socket = new WebSocket('ws://' + document.domain + ':5000/ws');
+const socket = new WebSocket('ws://' + document.domain + ':8080/ws');
 
 // Open
 socket.addEventListener('open', (event) => {

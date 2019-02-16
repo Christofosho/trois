@@ -102,6 +102,8 @@ h2.message {
     border: 5px outset black;
     border-radius: 10px;
     padding: 5px;
+    max-width: 400px;
+    justify-content: flex-start;
 }
 
 .card {
@@ -127,6 +129,7 @@ h2.message {
     border: 5px outset black;
     border-radius: 10px;
     padding: 5px;
+    padding-bottom: 22px;
 }
 
 .player {
