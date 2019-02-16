@@ -1,10 +1,14 @@
-import uuid
+import logging
+
 from trois.message import Message
 from trois.room import Room
+from trois.user import User
 from trois.validator import Validator
 
 
 class Handler():
+    logger = logging.getLogger('handler')
+
     def __init__(self):
         """ Create two dicts:
 
@@ -13,8 +17,17 @@ class Handler():
         """
         self.rooms = {}
         self.users = {}
+        self.messages = set()
 
         self.validator = Validator(self)
+
+        self.logger.setLevel(logging.INFO)
+        fh = logging.FileHandler('error.log')
+        fh.setLevel(logging.ERROR)
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        self.logger.addHandler(fh)
+        self.logger.addHandler(ch)
 
     def distribute(self, client, payload):
         """ Distribute the payload to the correct handler function
@@ -22,40 +35,50 @@ class Handler():
 
             client: socket object
             payload: dict of information including a type
+
+            Must return a Message object.
         """
         message_type = payload.get('message_type', None)
-        user_id = payload.get('user_id', None)
         valid_message = self.validator.validate_message_type(message_type)
         if not valid_message:
-            return Message(
-                message_type="error",
+            self.messages.add(Message(
                 payload={
+                    'message_type': "error",
                     'message': [
                         "Invalid Action",
                         "You have attempted to perform an invalid action.",
                         "Contact _ if you need assistance."
                     ]
                 },
-                debug_print="Invalid message: {}".format(message_type)
-            )
+                recipients=[client]
+            ))
+            self.logger.error("Invalid message sent by {}".format(
+                client.user_id
+            ))
+            return
 
+        user_id = payload.get('user_id', None)
         if message_type == "register":
             # Register a user in the system.
-            user_id = self.add_user(client)
-            return Message(
-                message_type="register",
+            user = self.add_user(client)
+            self.messages.add(Message(
                 payload={
-                    'user_id': user_id
+                    'message_type': "register",
+                    'user_id': user.user_id
                 },
-                debug_print="User registered: {}".format(user_id)
-            )
+                recipients=[user.socket_identifier]
+            ))
+            self.logger.info("Added user {}".format(
+                user.user_id
+            ))
+            return
 
         # All other routes assume the user is authenticated.
-        valid_user = self.validator.validate_user_id(user_id)
-        if not valid_user:
-            return Message(
-                message_type="error",
+        user = self.validator.validate_user_id(user_id)
+        if not user:
+            self.messages.add(Message(
                 payload={
+                    'message_type': "error",
                     'message': [
                         "Invalid User ID",
                         "Oops! Looks like your User ID is"
@@ -63,203 +86,265 @@ class Handler():
                         "Reload the page to fix the problem."
                     ]
                 },
-                debug_print="Invalid user: {}".format(user_id)
-            )
+                recipients=[client]
+            ))
+            self.logger.error("Invalid user {}.".format(
+                user_id
+            ))
+            return
 
         if message_type == "unregister":
             # Remove a user from the handler.
-            user_id = self.remove_user(user_id)
-            return Message( # TODO: Handle this? Maybe.
-                message_type="unregister",
-                payload={}
-            )
+            self.logger.info("Removed user {}.".format(
+                user.user_id
+            ))
+            self.remove_user(user)
+            # TODO: Send an update if user was in _room_
+            # self.messages.put(Message(
+            #     payload={
+            #         'message_type': "unregister"
+            #     },
+            #     recipients=[]
+            # ))
 
         elif message_type == "new_room":
             # Create a new room and add the user to it.
-            room = self.add_room(user_id)
-            error = self.add_user_to_room(user_id, room)
+            room = self.add_room()
+            error = self.add_user_to_room(user, room)
             if error:
-                return Message(
-                    message_type="error",
+                self.messages.add(Message(
                     payload={
+                        'message_type': "error",
                         "message": error
-                    }
-                )
+                    },
+                    recipients=[user.socket_identifier]
+                ))
+                self.logger.error("Error joining room {} for user {}.".format(
+                    room.room_id, user.user_id
+                ))
 
-            return Message(
-                message_type="init_room",
-                payload={
-                    'room': self.getRoomInformation(room),
-                    'message': [
-                        "New Room",
-                        "You have created a new room.",
-                        "Your Room ID is: {}".format(room.room_id)
+            else:
+                self.messages.add(Message(
+                    payload={
+                        'message_type': "init_room",
+                        'room': room.get_public_information(),
+                        'message': [
+                            "New Room",
+                            "You have created a new room.",
+                            "Your Room ID is: {}".format(room.room_id)
+                        ]
+                    },
+                    recipients=[
+                        p.socket_identifier for p in room.players.values()
                     ]
-                },
-                debug_print="Creating a new room with user: {}".format(user_id)
-            )
+                ))
+                self.logger.info("User {} joined room {}.".format(
+                    user.user_id, room.room_id
+                ))
+            return
 
         # All other routes assume the room exists.
         room_id = payload.get('room_id', None)
-        valid_room = self.validator.validate_room_id(room_id)
-        if not valid_room:
-            return Message(
-                message_type="error",
+        room = self.validator.validate_room_id(room_id)
+        if not room:
+            self.messages.add(Message(
                 payload={
+                    'message_type': "error",
                     'message': [
                         "Invalid Room ID",
                         "Please verify the ID you have used and try again."
                     ]
                 },
-                debug_print="Invalid room_id for user: {}".format(user_id)
-            )
+                recipients=[user.socket_identifier]
+            ))
+            self.logger.error("Invalid room {} for user {}.".format(
+                room_id, user.user_id
+            ))
+            return
 
         if message_type == "join_room":
             # Player joins room if game has not begun.
-            error = self.add_user_to_room(user_id, valid_room)
+            error = self.add_user_to_room(user, room)
             if error:
-                return Message(
-                    message_type="error",
+                self.messages.add(Message(
                     payload={
+                        'message_type': "error",
                         'message': error
-                    }
-                )
+                    },
+                    recipients=[user.socket_identifier]
+                ))
+                self.logger.error("Failed to add user {} to room {}.".format(
+                    user.user_id, room.room_id
+                ))
 
-            return Message(
-                message_type="init_room",
-                payload={
-                    'room': self.getRoomInformation(valid_room),
-                    'message': [
-                        "New Player",
-                        "{} has joined the room.".format(
-                            valid_room.players[user_id]['name']
-                        )
+            else:
+                self.messages.add(Message(
+                    payload={
+                        'message_type': "init_room",
+                        'room': room.get_public_information(),
+                        'message': [
+                            "New Player",
+                            "{} has joined the room.".format(
+                                user.name
+                            )
+                        ]
+                    },
+                    recipients=[
+                        p.socket_identifier for p in room.players.values()
                     ]
-                },
-                broadcast=True,
-                debug_print="User ID {} has joined Room ID {}".format(
-                    user_id, valid_room.room_id
-                )
-            )
+                ))
+                self.logger.info("User {} joined room {}.".format(
+                    user.user_id, room.room_id
+                ))
+            return
 
         elif message_type == "start_room":
             # Start the game.
-            self.start_room(user_id, valid_room)
-            return Message(
-                message_type="start_room",
+            self.messages.add(Message(
                 payload={
-                    'room': self.getRoomInformation(valid_room),
+                    'message_type': "start_room",
+                    'message': self.start_room(user, room),
+                    'room': room.get_public_information()
+                },
+                recipients=[
+                    p.socket_identifier for p in room.players.values()
+                ]
+            ))
+            self.logger.info("User {} has requested to start_room.".format(
+                user.user_id
+            ))
+            return
+
+        elif message_type == "leave_room":
+            self.messages.add(Message(
+                payload={
+                    'message_type': "leave_room",
+                    'message': self.leave_room(user, room)
+                },
+                recipients=[user.socket_identifier]
+            ))
+            self.messages.add(Message(
+                payload={
+                    'message_type': "update_room",
+                    'room': room.get_public_information(),
                     'message': [
-                        "Game Started",
-                        "Let the matching begin!"
+                        "User Left Room",
+                        "{} has left the room.".format(user.name)
                     ]
                 },
-                broadcast=True
-            )
+                recipients=[
+                    p.socket_identifier for p in room.players.values()
+                ]
+            ))
+            self.logger.error("User {} has left room {}.".format(
+                user.user_id, room.room_id
+            ))
+            return
 
-        elif message_type == "send_action":
+        # The following actions must have a game started.
+        if not room.started:
+            self.logger.error(
+                "User {} attempted to perform {}"
+                " while not in room {}.".format(
+                    user.user_id, message_type, room.room_id
+                )
+            )
+            return
+
+        if message_type == "send_action":
             # Check the user submitted cards to see if
             # they are a match.
             cards = payload.get('cards', None)
-            valid_cards = self.validator.validate_cards(valid_room, cards)
+            valid_cards = self.validator.validate_cards(room, cards)
             if not valid_cards:
-                return Message(
-                    message_type="error",
+                self.messages.add(Message(
                     payload={
+                        'message_type': "error",
                         "message": [
                             "Invalid Cards",
                             "Please try another set of cards."
                         ]
-                    }
-                )
+                    },
+                    recipients=[user.socket_identifier]
+                ))
+                self.logger.error("User {} attempted to use invalid cards.".format(
+                    user.user_id, room.room_id
+                ))
+                self.logger.error(cards)
 
-            message = self.handle_action(user_id, valid_room, cards)
-            return Message(
-                message_type="update_room",
-                payload={
-                    'room': self.getRoomInformation(valid_room),
-                    'message': message
-                },
-                broadcast=True
-            )
+            else:
+                self.messages.add(Message(
+                    payload={
+                        'message_type': "update_room",
+                        'message': self.handle_action(user, room, cards),
+                        'room': room.get_public_information()
+                    },
+                    recipients=[
+                        p.socket_identifier for p in room.players.values()
+                    ]
+                ))
+                self.logger.info("User {} has performed {}.".format(
+                    user.user_id, message_type
+                ))
+            return
 
         elif message_type == "no_matches":
-            message = self.add_no_matches(user_id, valid_room)
-            return Message(
-                message_type="update_room",
+            self.messages.add(Message(
                 payload={
-                    'room': self.getRoomInformation(valid_room),
-                    'message': message
+                    'message_type': "update_room",
+                    'message': self.add_no_matches(user, room),
+                    'room': room.get_public_information()
                 },
-                broadcast=True
-            )
+                recipients=[
+                    p.socket_identifier for p in room.players.values()
+                ]
+            ))
+            self.logger.error("User {} has declared no_matches.".format(
+                user.user_id
+            ))
 
         elif message_type == "end_room":
-            vote_complete = self.vote_to_end_room(user_id, valid_room)
-            if not vote_complete:
-                return Message(
-                    message_type="error",
-                    payload={
-                        'message': [
-                            "Vote To End",
-                            "A vote to end the room has been initiated."
-                        ]
-                    },
-                    broadcast=True
-                )
-
-            message = self.end_room(valid_room)
-            return Message(
-                message_type="init_room",
+            self.messages.add(Message(
                 payload={
-                    'room': self.getRoomInformation(valid_room),
-                    'message': message
+                    'message_type': "init_room",
+                    'message': self.vote_to_end_room(user, room),
+                    'room': room.get_public_information()
                 },
-                broadcast=True
-            )
-
-        elif message_type == "leave_room":
-            # TODO: How to broadcast this?
-            return Message(
-                message_type="leave_room",
-                payload={
-                    'message': self.leave_room(user_id, valid_room)
-                }
-            )
+                recipients=[
+                    p.socket_identifier for p in room.players.values()
+                ]
+            ))
+            self.logger.error("User {} has voted to end the room.".format(
+                user.user_id
+            ))
+            return
 
     def add_user(self, client):
         """ Add a user to the user dict and return the id.
 
             client: socket object
         """
-        user_id = str(uuid.uuid4())
-        client.user_id = user_id
-        client.factory.register(user_id, client)
+        return User(self, client)
 
-        # Set to None until a room is assigned.
-        self.users[user_id] = {
-            'room_id': None
-        }
-        return user_id
-
-    def remove_user(self, user_id):
+    def remove_user(self, user):
         """ Remove a user from the user dict. """
         room_id = None
-        if user_id in self.users:
-            room_id = self.users[user_id]['room_id']
-            del self.users[user_id]
+        if user.user_id not in self.users:
+            return
+
+        room_id = user.room_id
 
         if room_id and room_id in self.rooms:
             room = self.rooms[room_id]
-            if user_id in room.players:
-                del room.players[user_id]
+            if user.user_id in room.players:
+                del room.players[user.user_id]
 
             if len(room.players) < 1:
-                self.remove_room(room_id)
+                self.remove_room(room)
 
-        return user_id
+        del self.users[user.user_id]
 
-    def add_room(self, owner_id):
+    def add_room(self):
         """ Add a new room to the self.rooms dict
             and generate a room_id for sharing.
             Return the room information generated.
@@ -271,15 +356,15 @@ class Handler():
         if room_id in self.rooms:
             del self.rooms[room_id]
 
-    def add_user_to_room(self, user_id, room):
+    def add_user_to_room(self, user, room):
         """ Add a user to a room, if they can join. """
-        can_join_error = self.can_join_room(user_id, room)
+        can_join_error = self.can_join_room(user, room)
         if can_join_error:
             return can_join_error
 
         for r in self.rooms.values():
-            if user_id in r.players:
-                self.remove_user_from_room(user_id, r)
+            if user.user_id in r.players:
+                self.remove_user_from_room(user, r)
 
         active_players = len(room.players)
         fake_name = "Player 1"
@@ -292,19 +377,16 @@ class Handler():
         elif active_players == 3:
             fake_name = "Player 4"
 
-        room.players[user_id] = {
-            'name': fake_name,
-            'score': 0
-        }
-        self.users[user_id]['room_id'] = room.room_id
+        user.name = fake_name
+        user.room_id = room.room_id
+        room.add_user(user)
 
-    def remove_user_from_room(self, user_id, room):
+    def remove_user_from_room(self, user, room):
         """ Remove a user from a room. """
-        del room.players[user_id]
+        del room.players[user.user_id]
 
     def can_join_room(self, user_id, room):
         """ Return an error if user_id cannot join room. """
-
         if room.game_stage != 0:
             # Game is started.
             return [
@@ -323,30 +405,54 @@ class Handler():
 
         return
 
-    def start_room(self, user_id, room):
+    def start_room(self, user, room):
         """ Initialize game parameters and draw
             the first set of active cards.
         """
+        if user.user_id not in room.players:
+            return [
+                "Invalid Request",
+                "Something went wrong with your request."
+            ]
+
+        room.start_room.add(user.user_id)
+
+        if len(room.start_room) != len(room.players):
+            # Still waiting on other votes.
+            return [
+                "Time to Play",
+                "Waiting for all players to press the \"Ready\" button."
+            ]
+
         room.game_stage = 1
         room.active_cards = [
             room.deck.draw()
             for _ in range(12)
         ]
+        room.start_room.clear()
+        room.started = True
+        for user in room.players.values():
+            user.score = 0
 
-    def leave_room(self, user_id, room):
+        return [
+            "Game Started",
+            "Let the matching begin!"
+        ]
+
+    def leave_room(self, user, room):
         """ Remove user from room. """
-        self.remove_user_from_room(user_id, room)
+        self.remove_user_from_room(user, room)
         return [
             "Left Room",
             "You have left the room."
         ]
 
-    def add_no_matches(self, user_id, room):
+    def add_no_matches(self, user, room):
         """ Adds a user to the "no_matches" list.
             When all users in the room are on this list,
             we want to draw 3 cards.
         """
-        room.no_matches.add(user_id)
+        room.no_matches.add(user.user_id)
 
         if sorted(room.no_matches) == sorted(room.players.keys()):
             # All players have voted for a card draw.
@@ -372,7 +478,11 @@ class Handler():
             "Waiting on other players to declare no matches before proceeding."
         ]
 
-    def handle_action(self, user_id, room, cards):
+    def handle_action(self, user, room, cards):
+        """ Determine matching cards, and whether the
+            game should continue after the action is
+            complete.
+        """
         # Get card definitions.
         card_defs = [
             card for card in room.active_cards
@@ -385,7 +495,7 @@ class Handler():
         ]
         if success:
             # Give the player a point.
-            room.players[user_id]['score'] += 1
+            user.score += 1
 
             # Remove the three cards picked.
             active_cards = [
@@ -416,26 +526,31 @@ class Handler():
 
         return message
 
-    def vote_to_end_room(self, user_id, room):
+    def vote_to_end_room(self, user, room):
         """ End the current game if all users vote.
             If force is True, end game anyway.
         """
-        if user_id is not None:
-            room.end_room.add(user_id)
-            if len(room.end_room) != len(room.players):
-                # Still waiting on other votes.
-                return False
-        return True
+        room.end_room.add(user.user_id)
+        if len(room.end_room) != len(room.players):
+            # Still waiting on other votes.
+            return [
+                "Vote To End",
+                "A vote to end the room has been initiated."
+            ]
+        return self.end_room(room)
 
     def end_room(self, room):
+        """ Reset a given room and return
+            game over message.
+        """
         room.reset()
         return [
             "Game Over",
             "The winner of this round: {}!".format(
                 max(
                     room.players.values(),
-                    key=lambda x: x['score']
-                )['name']
+                    key=lambda x: x.score
+                ).name
             )
         ]
 
@@ -457,6 +572,9 @@ class Handler():
         return match == 4
 
     def compare_element(self, card1, card2, card3, element):
+        """ Compare one element of three cards to determine
+            if they are all the same, or all different.
+        """
         e1 = card1[element]
         e2 = card2[element]
         e3 = card3[element]
@@ -464,12 +582,3 @@ class Handler():
             # All the same or all different.
             return 1
         return 0
-
-    def getRoomInformation(self, room):
-        return {
-            'room_id': room.room_id,
-            'players': room.players,
-            'active_cards': [
-                c[0] for c in room.active_cards
-            ]
-        }

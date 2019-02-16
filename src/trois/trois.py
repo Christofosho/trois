@@ -15,15 +15,16 @@ from trois.handler import Handler
 handler = Handler()
 
 
-class EchoServerProtocol(WebSocketServerProtocol):
+class ServerProtocol(WebSocketServerProtocol):
     def onMessage(self, payload, isBinary):
         try:
-            data = handler.distribute(self, json.loads(payload))
-            if data.broadcast:
-                self.factory.broadcast(data)
-
-            else:
-                self.sendMessage(data.to_json_utf8())
+            handler.distribute(self, json.loads(payload))
+            for message in handler.messages:
+                for r in message.recipients:
+                    r.sendMessage(
+                        message.to_json_utf8()
+                    )
+            handler.messages.clear()
 
         except Exception as e:
             raise e
@@ -34,32 +35,12 @@ class EchoServerProtocol(WebSocketServerProtocol):
             'message_type': "unregister",
             'user_id': self.user_id
         })
-        self.factory.unregister(self.user_id)
-
-
-class BroadcastServerFactory(WebSocketServerFactory):
-    def __init__(self, url):
-        WebSocketServerFactory.__init__(self, url)
-        self.clients = {}
-
-    def register(self, client_id, client):
-        if client not in self.clients:
-            self.clients[client_id] = client
-
-    def unregister(self, client_id):
-        if client_id in self.clients:
-            del self.clients[client_id]
-
-    def broadcast(self, data):
-        for user_id in data.payload['room']['players'].keys():
-            if user_id in self.clients:
-                self.clients[user_id].sendMessage(data.to_json_utf8())
 
 
 def run_server():
     log.startLogging(sys.stdout)
-    factory = BroadcastServerFactory(u"ws://127.0.0.1:5000")
-    factory.protocol = EchoServerProtocol
+    factory = WebSocketServerFactory(u"ws://127.0.0.1:5000")
+    factory.protocol = ServerProtocol
     resource = WebSocketResource(factory)
     root = File("./public/")
     root.putChild(b"ws", resource)

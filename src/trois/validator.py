@@ -22,8 +22,7 @@ class Validator():
 
     def validate_user_id(self, user_id):
         if user_id and (user_id in self.handler.users):
-            return True
-        return False
+            return self.handler.users[user_id]
 
     def validate_room_id(self, room_id):
         if room_id and (room_id in self.handler.rooms):

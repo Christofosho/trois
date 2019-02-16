@@ -28,9 +28,10 @@ export default class Game extends React.Component {
             request sent to the server.
         */
         const data = JSON.parse(event.data);
-        if (data.payload.message) {
+        console.log(data);
+        if (data.message) {
             this.setState({
-                message: data.payload.message
+                message: data.message
             });
         }
 
@@ -38,27 +39,31 @@ export default class Game extends React.Component {
             // Prior to joining a room, the user
             // is given an id for updates.
             this.setState({
-                user_id: data.payload.user_id
+                user_id: data.user_id
             });
         }
 
         else if (data.message_type == "init_room") {
-            this.setState({
-                mode: 1,
-                room: data.payload.room
-            });
+            if (!data.room.started) {
+                this.setState({
+                    mode: 1,
+                    room: data.room
+                });
+            }
         }
 
         else if (data.message_type == "start_room") {
-            this.setState({
-                mode: 2,
-                room: data.payload.room
-            });
+            if (data.room.started) {
+                this.setState({
+                    mode: 2,
+                    room: data.room
+                });
+            }
         }
 
         else if (data.message_type == "update_room") {
             this.setState({
-                room: data.payload.room
+                room: data.room
             });
         }
 
