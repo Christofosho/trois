@@ -35,6 +35,14 @@ export default class Cards extends React.Component {
     }
 
     componentDidUpdate(pProps, pState) {
+        for (const i in this.state.selected_cards) {
+            const card = this.state.selected_cards[i];
+            if (!this.props.activeCards.includes(card)) {
+                this.setState((state) => ({
+                    selected_cards: state.selected_cards.filter(c => c != card)
+                }));
+            }
+        }
         if (pState.selected_cards.length !== this.state.selected_cards.length
             && this.state.selected_cards.length == 3) {
             socket.send(JSON.stringify({
@@ -62,7 +70,7 @@ export default class Cards extends React.Component {
         });
 
         return (
-            <div className="cards row justify">
+            <div className="cards row">
                 {active}
             </div>
         );

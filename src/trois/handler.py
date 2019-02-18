@@ -29,6 +29,15 @@ class Handler():
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
 
+    def send_messages(self):
+        """ Sends messages over websocket. """
+        for message in self.messages:
+            for r in message.recipients:
+                r.sendMessage(
+                    message.to_json_utf8()
+                )
+        self.messages.clear()
+
     def distribute(self, client, payload):
         """ Distribute the payload to the correct handler function
             by determining the type of action the payload is requesting.
@@ -38,6 +47,7 @@ class Handler():
 
             Must return a Message object.
         """
+        print(client, payload)
         message_type = payload.get('message_type', None)
         valid_message = self.validator.validate_message_type(message_type)
         if not valid_message:
@@ -95,17 +105,24 @@ class Handler():
 
         if message_type == "unregister":
             # Remove a user from the handler.
+            name = user.name
+            room = self.validator.validate_room_id(user.room_id)
             self.logger.info("Removed user {}.".format(
-                user.user_id
+                user_id
             ))
             self.remove_user(user)
             # TODO: Send an update if user was in _room_
-            # self.messages.put(Message(
-            #     payload={
-            #         'message_type': "unregister"
-            #     },
-            #     recipients=[]
-            # ))
+            self.messages.add(Message(
+                payload={
+                    'message_type': "unregister",
+                    'message': [
+                        "{} has disconnected.".format(name)
+                    ]
+                },
+                recipients=[
+                    p.socket_identifier for p in room.players.values()
+                ]
+            ))
 
         elif message_type == "new_room":
             # Create a new room and add the user to it.
@@ -288,18 +305,18 @@ class Handler():
                 ))
             return
 
-        elif message_type == "no_matches":
+        elif message_type == "draw_cards":
             self.messages.add(Message(
                 payload={
                     'message_type': "update_room",
-                    'message': self.add_no_matches(user, room),
+                    'message': self.draw_cards(user, room),
                     'room': room.get_public_information()
                 },
                 recipients=[
                     p.socket_identifier for p in room.players.values()
                 ]
             ))
-            self.logger.error("User {} has declared no_matches.".format(
+            self.logger.error("User {} has declared draw_cards.".format(
                 user.user_id
             ))
 
@@ -367,15 +384,7 @@ class Handler():
                 self.remove_user_from_room(user, r)
 
         active_players = len(room.players)
-        fake_name = "Player 1"
-        if active_players == 1:
-            fake_name = "Player 2"
-
-        elif active_players == 2:
-            fake_name = "Player 3"
-
-        elif active_players == 3:
-            fake_name = "Player 4"
+        fake_name = "Player {}".format(active_players + 1)
 
         user.name = fake_name
         user.room_id = room.room_id
@@ -421,7 +430,7 @@ class Handler():
             # Still waiting on other votes.
             return [
                 "Time to Play",
-                "Waiting for all players to press the \"Ready\" button."
+                "Waiting for all players to press the \"Start\" button."
             ]
 
         room.game_stage = 1
@@ -442,40 +451,43 @@ class Handler():
     def leave_room(self, user, room):
         """ Remove user from room. """
         self.remove_user_from_room(user, room)
+        for i, p in enumerate(room.players.values()):
+            p.name = "Player {}".format(i + 1)
         return [
             "Left Room",
             "You have left the room."
         ]
 
-    def add_no_matches(self, user, room):
-        """ Adds a user to the "no_matches" list.
+    def draw_cards(self, user, room):
+        """ Adds a user to the "draw_cards" list.
             When all users in the room are on this list,
             we want to draw 3 cards.
         """
-        room.no_matches.add(user.user_id)
+        room.draw_cards.add(user.user_id)
 
-        if sorted(room.no_matches) == sorted(room.players.keys()):
+        if sorted(room.draw_cards) == sorted(room.players.keys()):
             # All players have voted for a card draw.
             if len(room.deck) > 0:
                 room.active_cards.extend([
                     room.deck.draw() for _ in range(3)
                 ])
-                room.no_matches.clear()
+                room.draw_cards.clear()
                 room.end_room.clear()
                 return [
-                    "No Matches Success",
-                    "3 new cards have been added to the active cards."
+                    "Cards Added",
+                    "3 new cards have been added to the game."
                 ]
 
             else:
                 return [
-                    "Cannot Declare No Matches",
+                    "Cannot Draw Cards",
                     "There are no cards left in the deck."
                 ]
 
         return [
-            "No Matches Declared!",
-            "Waiting on other players to declare no matches before proceeding."
+            "Draw Cards?",
+            "{} would like to draw 3 new cards.".format(user.name),
+            "Click \"Draw Cards\" if you agree."
         ]
 
     def handle_action(self, user, room, cards):
@@ -490,8 +502,8 @@ class Handler():
         ]
         success = self.check_cards(card_defs)
         message = [
-            "Cards Do Not Match",
-            "No match this time. Try again."
+            "Failed Match",
+            "The cards {} chose did not match.".format(user.name)
         ]
         if success:
             # Give the player a point.
@@ -504,7 +516,7 @@ class Handler():
             ]
 
             message = [
-                "Match Found!"
+                "Match Found by {}!".format(user.name)
             ]
 
             if (len(active_cards) == 0
@@ -522,7 +534,7 @@ class Handler():
 
             room.active_cards = active_cards
             room.end_room.clear()
-            room.no_matches.clear()
+            room.draw_cards.clear()
 
         return message
 
@@ -545,7 +557,7 @@ class Handler():
         """
         room.reset()
         return [
-            "Game Over",
+            "Game Over | Room ID: {}".format(room.room_id),
             "The winner of this round: {}!".format(
                 max(
                     room.players.values(),
@@ -559,6 +571,9 @@ class Handler():
             determine whether they meet the
             matching criteria.
         """
+        if len(cards) < 3:
+            return False
+
         match = 0
         card1 = cards[0][1]
         card2 = cards[1][1]

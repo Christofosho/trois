@@ -12,13 +12,14 @@ export default class Room extends React.Component {
     render() {
         return (
             <div className="room column">
-                <div className="row justify">
+                <div className="scene justify">
                     { this.props.mode >= 2 ?
                     <Cards userId={this.props.userId}
                         roomId={this.props.roomId}
                         activeCards={this.props.activeCards} />
                     : null }
-                    <Players players={this.props.players} />
+                    <Players players={this.props.players}
+                        userId={this.props.userId} />
                 </div>
                 <Controls mode={this.props.mode}
                     userId={this.props.userId}

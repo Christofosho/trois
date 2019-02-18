@@ -30,6 +30,10 @@ h2 {
     display: block;
 }
 
+.bold {
+    font-weight: 700;
+}
+
 .row {
     display: flex;
 }
@@ -75,9 +79,17 @@ h2.message {
     margin: 16px 0;
 }
 
-.new-room, .join-room-button, .start-room,
-.end-room, .leave-room, .no-matches {
+.new-room, .join-room-button {
     width: 116px;
+}
+
+.start-room, .end-room, .leave-room, .draw-cards {
+    width: 90px;
+    margin: 0 2px;
+}
+
+.new-room, .join-room-button, .start-room,
+.end-room, .leave-room, .draw-cards {
     height: 34px;
     border: 1px solid darkgray;
     border-radius: 5px;
@@ -95,6 +107,17 @@ h2.message {
     border-radius: 5px;
 
     font-size: 1.2em;
+}
+
+.scene {
+    display: flex;
+    flex-direction: row;
+}
+
+@media(max-width: 400px) {
+    .scene {
+        flex-direction: column;
+    }
 }
 
 .cards {
@@ -121,15 +144,27 @@ h2.message {
 }
 
 .active-card {
-    box-shadow: 0 0 4px gold;
+    box-shadow: 0 0 8px black;
+}
+
+.active-card > div {
+    border: 2px;
 }
 
 .players {
-    min-width: 90px;
+    min-width: 100px;
     border: 5px outset black;
     border-radius: 10px;
-    padding: 5px;
+    padding: 3px;
     padding-bottom: 22px;
+}
+
+.players-title {
+    text-align: center;
+    border-bottom: 1px solid black;
+    margin: 0;
+    margin-bottom: 5px;
+    line-height: 40px;
 }
 
 .player {

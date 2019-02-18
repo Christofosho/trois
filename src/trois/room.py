@@ -20,7 +20,7 @@ class Room():
         self.active_cards = []
         self.started = False
         self.start_room = set()
-        self.no_matches = set()
+        self.draw_cards = set()
         self.end_room = set()
 
     def add_user(self, user):
@@ -45,6 +45,8 @@ class Room():
             'room_id': self.room_id,
             'started': self.started,
             'players': self.get_users(),
+            'draw_cards': list(self.draw_cards),
+            'end_room': list(self.end_room),
             'active_cards': [
                 c[0] for c in self.active_cards
             ]

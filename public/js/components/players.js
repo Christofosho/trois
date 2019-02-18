@@ -11,7 +11,9 @@ export default class Players extends React.Component {
         let activePlayers = Object.entries(this.props.players).map((val, i) => {
             return <Player key={i}
                 playerName={val[1]['name']}
-                playerScore={val[1]['score']} />;
+                playerScore={val[1]['score']}
+                isOwner={val[0] === this.props.userId}
+                />;
         });
         return (
             <aside className="players">

@@ -28,7 +28,6 @@ export default class Game extends React.Component {
             request sent to the server.
         */
         const data = JSON.parse(event.data);
-        console.log(data);
         if (data.message) {
             this.setState({
                 message: data.message
@@ -94,6 +93,8 @@ export default class Game extends React.Component {
                         roomId={this.state.room.room_id}
                         players={this.state.room.players}
                         activeCards={this.state.room.active_cards}
+                        drawCards={this.state.draw_cards}
+                        endGame={this.state.end_game}
                     />
                     : <Lobby userId={this.state.user_id} />}
             </div>

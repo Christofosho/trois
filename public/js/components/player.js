@@ -6,9 +6,10 @@ export default class Player extends React.Component {
     }
 
     render() {
+        const is_owner = this.props.isOwner ? "player-name bold" : "player-name";
         return (
             <div className="player row">
-                <div className="player-name">
+                <div className={is_owner}>
                     {this.props.playerName}
                 </div>
                 <div className="player-score">

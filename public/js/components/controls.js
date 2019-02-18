@@ -8,7 +8,7 @@ export default class Controls extends React.Component {
 
         this.leaveRoom = this.leaveRoom.bind(this);
         this.startRoom = this.startRoom.bind(this);
-        this.noMatches = this.noMatches.bind(this);
+        this.drawCards = this.drawCards.bind(this);
         this.endRoom = this.endRoom.bind(this);
     }
 
@@ -28,9 +28,9 @@ export default class Controls extends React.Component {
         }))
     }
 
-    noMatches(event) {
+    drawCards(event) {
         socket.send(JSON.stringify({
-            message_type: "no_matches",
+            message_type: "draw_cards",
             user_id: this.props.userId,
             room_id: this.props.roomId
         }));
@@ -48,19 +48,19 @@ export default class Controls extends React.Component {
         return (
             <div className="controls row">
                 <button className="leave-room" onClick={this.leaveRoom}>
-                    Leave Room
+                    Leave
                 </button>
                 {this.props.mode === 1 ?
                     <button className="start-room" onClick={this.startRoom}>
-                        Start Room
+                        Start
                     </button>
                 :
                 <React.Fragment>
-                    <button className="no-matches" onClick={this.noMatches}>
-                        No Matches
+                    <button className="draw-cards" onClick={this.drawCards}>
+                        Draw 3
                     </button>
                     <button className="end-room" onClick={this.endRoom}>
-                        End Room
+                        End
                     </button>
                 </React.Fragment>
                 }

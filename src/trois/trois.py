@@ -5,7 +5,7 @@ from autobahn.twisted.resource import WebSocketResource
 from autobahn.twisted.websocket import WebSocketServerFactory
 from autobahn.twisted.websocket import WebSocketServerProtocol
 
-from twisted.internet import reactor
+from twisted.internet import reactor, task
 from twisted.python import log
 from twisted.web.server import Site
 from twisted.web.static import File
@@ -16,15 +16,19 @@ handler = Handler()
 
 
 class ServerProtocol(WebSocketServerProtocol):
+    requests = []
+
     def onMessage(self, payload, isBinary):
         try:
-            handler.distribute(self, json.loads(payload))
-            for message in handler.messages:
-                for r in message.recipients:
-                    r.sendMessage(
-                        message.to_json_utf8()
-                    )
-            handler.messages.clear()
+            # Add an item to the requests lists
+            # which will be handled by the LoopingTask
+            # run in run_server.
+            self.requests.append([
+                handler.distribute, [
+                    self,
+                    json.loads(payload)
+                ]
+            ])
 
         except Exception as e:
             raise e
@@ -45,6 +49,18 @@ def run_server():
     root = File("./public/")
     root.putChild(b"ws", resource)
     site = Site(root)
+
+    def handle_requests():
+        for request in factory.protocol.requests:
+            f = request[0]
+            arguments = request[1]
+            f(*arguments)
+        factory.protocol.requests = []
+        handler.send_messages()
+
+    handle = task.LoopingCall(handle_requests)
+    handle.start(0.2)
+
     reactor.listenTCP(8080, site)
     reactor.run()
 
