@@ -22,12 +22,12 @@ class Handler():
         self.validator = Validator(self)
 
         self.logger.setLevel(logging.INFO)
-        fh = logging.FileHandler('error.log')
-        fh.setLevel(logging.ERROR)
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
-        self.logger.addHandler(fh)
-        self.logger.addHandler(ch)
+        eh = logging.FileHandler('error.log')
+        eh.setLevel(logging.ERROR)
+        ih = logging.FileHandler('info.log')
+        ih.setLevel(logging.INFO)
+        self.logger.addHandler(eh)
+        self.logger.addHandler(ih)
 
     def send_messages(self):
         """ Sends messages over websocket. """
@@ -485,9 +485,9 @@ class Handler():
                 ]
 
         return [
-            "Draw Cards?",
+            "Draw 3 Cards",
             "{} would like to draw 3 new cards.".format(user.name),
-            "Click \"Draw Cards\" if you agree."
+            "Click \"Draw\" if you agree."
         ]
 
     def handle_action(self, user, room, cards):
@@ -500,7 +500,7 @@ class Handler():
             card for card in room.active_cards
             if card[0] in cards
         ]
-        success = self.check_cards(card_defs)
+        success = room.deck.check_cards(card_defs)
         message = [
             "Failed Match",
             "The cards {} chose did not match.".format(user.name)
@@ -565,35 +565,3 @@ class Handler():
                 ).name
             )
         ]
-
-    def check_cards(self, cards):
-        """ Compare the cards passed in to
-            determine whether they meet the
-            matching criteria.
-        """
-        if len(cards) < 3:
-            return False
-
-        match = 0
-        card1 = cards[0][1]
-        card2 = cards[1][1]
-        card3 = cards[2][1]
-
-        match += self.compare_element(card1, card2, card3, 'shape')
-        match += self.compare_element(card1, card2, card3, 'colour')
-        match += self.compare_element(card1, card2, card3, 'count')
-        match += self.compare_element(card1, card2, card3, 'fill')
-
-        return match == 4
-
-    def compare_element(self, card1, card2, card3, element):
-        """ Compare one element of three cards to determine
-            if they are all the same, or all different.
-        """
-        e1 = card1[element]
-        e2 = card2[element]
-        e3 = card3[element]
-        if (e1 == e2 and e2 == e3) or (e1 != e2 and e1 != e3 and e2 != e3):
-            # All the same or all different.
-            return 1
-        return 0
