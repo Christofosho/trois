@@ -47,7 +47,6 @@ class Handler():
 
             Must return a Message object.
         """
-        print(client, payload)
         message_type = payload.get('message_type', None)
         valid_message = self.validator.validate_message_type(message_type)
         if not valid_message:
@@ -433,15 +432,7 @@ class Handler():
                 "Waiting for all players to press the \"Start\" button."
             ]
 
-        room.game_stage = 1
-        room.active_cards = [
-            room.deck.draw()
-            for _ in range(12)
-        ]
-        room.start_room.clear()
-        room.started = True
-        for user in room.players.values():
-            user.score = 0
+        room.start()
 
         return [
             "Game Started",
@@ -467,12 +458,11 @@ class Handler():
 
         if sorted(room.draw_cards) == sorted(room.players.keys()):
             # All players have voted for a card draw.
-            if len(room.deck) > 0:
-                room.active_cards.extend([
-                    room.deck.draw() for _ in range(3)
-                ])
-                room.draw_cards.clear()
-                room.end_room.clear()
+            room.draw_cards.clear()
+            room.end_room.clear()
+
+            added_new_cards = room.add_cards()
+            if added_new_cards:
                 return [
                     "Cards Added",
                     "3 new cards have been added to the game."
@@ -509,32 +499,19 @@ class Handler():
             # Give the player a point.
             user.score += 1
 
-            # Remove the three cards picked.
-            active_cards = [
-                card for card in room.active_cards
-                if card[0] not in cards
-            ]
-
             message = [
                 "Match Found by {}!".format(user.name)
             ]
 
-            if (len(active_cards) == 0
-                    and len(room.deck) == 0):
-                # Game complete.
-                return self.end_room(room)
-
-            if (len(active_cards) < 12
-                    and len(room.deck) > 0):
-                # Draw three more cards.
-                message.append("Three more cards are added to the table.")
-                active_cards.extend(
-                    [room.deck.draw() for _ in range(3)]
-                )
-
-            room.active_cards = active_cards
+            # Remove the three cards picked.
+            room.remove_cards(cards)
             room.end_room.clear()
             room.draw_cards.clear()
+            
+            if len(room.active_cards) < 12:
+                added_new_cards = room.add_cards()
+                if added_new_cards:
+                    message.append("Three more cards are added to the table.")
 
         return message
 

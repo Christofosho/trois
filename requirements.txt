@@ -5,7 +5,7 @@
 #    pip-compile --output-file requirements.txt setup.py
 #
 attrs==18.2.0             # via automat, twisted
-autobahn==19.1.1
+autobahn==19.2.1
 automat==0.7.0            # via twisted
 constantly==15.1.0        # via twisted
 hyperlink==18.0.0         # via twisted

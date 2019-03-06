@@ -1,8 +1,10 @@
 import os
 from setuptools import setup, find_packages
 
+
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
 
 setup(
     name="trois",
@@ -16,6 +18,9 @@ setup(
         'twisted',
         'autobahn'
     ],
+    extras_require={
+        'test': ["pytest", "tox", "hypothesis"],
+    },
     entry_points={
         'console_scripts': [
             'trois = trois.trois:run_server'

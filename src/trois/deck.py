@@ -35,7 +35,7 @@ class Deck():
             determine whether they meet the
             matching criteria.
         """
-        if len(cards) < 3:
+        if len(cards) != 3:
             return False
 
         match = 0

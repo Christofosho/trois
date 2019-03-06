@@ -23,6 +23,19 @@ class Room():
         self.draw_cards = set()
         self.end_room = set()
 
+    def start(self):
+        self.game_stage = 1
+        self.active_cards = [
+            self.deck.draw()
+            for _ in range(12)
+        ]
+        self.start_room.clear()
+        self.draw_cards.clear()
+        self.end_room.clear()
+        self.started = True
+        for user in self.players.values():
+            user.score = 0
+
     def add_user(self, user):
         """ Add a user to the room. """
         self.players[user.user_id] = user
@@ -36,6 +49,27 @@ class Room():
             }
             for user in self.players.values()
         }
+
+    def add_cards(self, amount=3):
+        if (len(self.deck) > 0):
+            self.active_cards.extend(
+                [self.deck.draw() for _ in range(amount)]
+            )
+            return True
+        return False
+
+    def remove_cards(self, cards=[]):
+        self.active_cards = [
+            card for card in self.active_cards
+            if card[0] not in cards
+        ]
+
+    def room_complete(self):
+        if (len(self.active_cards) == 0
+                and len(self.deck) == 0):
+            # Game complete.
+            return True
+        return False
 
     def get_public_information(self):
         """ Return a subset of the data in the room
