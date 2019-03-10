@@ -16,7 +16,6 @@ nav {
     height: 55px;
     width: 100vw;
     display: flex;
-    background: rgba(0, 0, 0, 0.05);
 }
 
 nav  a {
@@ -40,6 +39,14 @@ h2 {
 
 h4 {
     margin: 5px 0;
+}
+
+main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.1);
 }
 
 .centered {
@@ -73,7 +80,7 @@ h4 {
 
 .game {
     margin: 0 auto;
-    padding: 0 10px;
+    padding: 10px;
     align-items: center;
     max-width: 740px;
 }
@@ -151,6 +158,7 @@ h2.message {
     padding: 5px;
     max-width: 400px;
     justify-content: flex-start;
+    background: rgba(208, 252, 255, 1);
 }
 
 .card {
@@ -158,13 +166,14 @@ h2.message {
     flex-basis: 24%;
 }
 
-.card > div {
+.card > div, .example-card {
     width: 56px;
     height: 89px;
     border: 1px solid black;
     border-radius: 8px;
     margin: 0 auto;
     cursor: pointer;
+    background-color: white !important;
 }
 
 .active-card {
@@ -181,6 +190,7 @@ h2.message {
     border-radius: 10px;
     padding: 3px;
     padding-bottom: 22px;
+    background: rgba(208, 252, 255, 1);
 }
 
 .players-title {
@@ -224,6 +234,7 @@ h2.message {
     display: flex;
     flex-direction: column;
     width: 60vw;
+    max-width: 600px;
     background: white;
     border-radius: 5px;
     padding: 10px;
@@ -256,13 +267,6 @@ h2.message {
     display: flex;
     justify-content: space-around;
     padding-bottom: 15px;
-}
-
-.example-card {
-    width: 56px;
-    height: 89px;
-    border: 1px solid black;
-    border-radius: 8px;
 }
 
 .example-one-card-one {
@@ -322,7 +326,7 @@ h2.message {
 footer {
     height: 40px;
     width: 100vw;
-    background: rgba(0, 0, 0, 0.05);
+    
 }
 
 .copyright {
