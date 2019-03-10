@@ -58,7 +58,9 @@ class Room():
             return True
         return False
 
-    def remove_cards(self, cards=[]):
+    def remove_cards(self, cards=None):
+        if cards is None:
+            cards = []
         self.active_cards = [
             card for card in self.active_cards
             if card[0] not in cards
