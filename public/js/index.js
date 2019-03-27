@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import Game from './components/game';
 
 const socket = new WebSocket(
-    (process.env.SSL_ENABLED == 1 ? 'wss://' : 'ws://')
+    (process.env.SSL_ENABLED == "1" ? 'wss://' : 'ws://')
     + document.domain + ':8080/ws'
 );
 
