@@ -1,4 +1,5 @@
 const path = require('path');
+const dotenv = require('dotenv-webpack');
 
 module.exports = {
   devtool: 'eval-source-map',
@@ -7,6 +8,9 @@ module.exports = {
     filename: "bundle.js",
     path: path.resolve(__dirname, "public")
   },
+  plugins: [
+    new dotenv()
+  ],
   mode: "development",
   "module": {
     rules: [

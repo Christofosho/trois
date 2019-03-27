@@ -16,7 +16,8 @@ setup(
     package_dir={'': 'src'},
     install_requires=[
         'twisted',
-        'autobahn'
+        'autobahn',
+        'environs'
     ],
     extras_require={
         'test': ["pytest", "tox", "hypothesis"],

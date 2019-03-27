@@ -9,6 +9,9 @@ class Room():
             random.choices(string.ascii_letters+string.digits, k=8)
         )
         self.players = {}
+        self.options = {
+            "GAME_MODE": 0
+        }
         self.reset()
 
         handler.rooms[self.room_id] = self
@@ -22,6 +25,9 @@ class Room():
         self.start_room = set()
         self.draw_cards = set()
         self.end_room = set()
+
+    def options(self, op):
+        pass
 
     def start(self):
         self.game_stage = 1

@@ -2,6 +2,7 @@ import React from 'react';
 
 import Cards from './cards';
 import Controls from './controls';
+import Options from './options';
 import Players from './players';
 
 export default class Room extends React.Component {
@@ -17,7 +18,7 @@ export default class Room extends React.Component {
                     <Cards userId={this.props.userId}
                         roomId={this.props.roomId}
                         activeCards={this.props.activeCards} />
-                    : null }
+                    : <Options/> }
                     <Players players={this.props.players}
                         userId={this.props.userId} />
                 </div>

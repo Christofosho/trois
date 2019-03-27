@@ -5,6 +5,8 @@ from autobahn.twisted.resource import WebSocketResource
 from autobahn.twisted.websocket import WebSocketServerFactory
 from autobahn.twisted.websocket import WebSocketServerProtocol
 
+from environs import Env
+
 from twisted.internet import reactor, task
 from twisted.python import log
 from twisted.web.server import Site
@@ -12,6 +14,8 @@ from twisted.web.static import File
 
 from trois.handler import Handler
 
+env = Env()
+env.read_env()
 handler = Handler()
 
 
@@ -43,7 +47,10 @@ class ServerProtocol(WebSocketServerProtocol):
 
 def run_server():
     log.startLogging(sys.stdout)
-    factory = WebSocketServerFactory(u"ws://127.0.0.1:8080")
+    location = u"{}127.0.0.1:8080".format(
+        "wss://" if env.int("SSL_ENABLED") == 1 else "ws://"
+    )
+    factory = WebSocketServerFactory(location)
     factory.protocol = ServerProtocol
     resource = WebSocketResource(factory)
     root = File("./public/")

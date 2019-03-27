@@ -46,7 +46,7 @@ export default class Controls extends React.Component {
 
     render() {
         return (
-            <div className="controls row">
+            <section className="controls row">
                 <button className="leave-room" onClick={this.leaveRoom}>
                     Leave
                 </button>
@@ -64,7 +64,7 @@ export default class Controls extends React.Component {
                     </button>
                 </React.Fragment>
                 }
-            </div>
+            </section>
         );
     }
 }

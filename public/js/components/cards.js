@@ -70,9 +70,9 @@ export default class Cards extends React.Component {
         });
 
         return (
-            <div className="cards row">
+            <section className="cards row">
                 {active}
-            </div>
+            </section>
         );
     }
 }

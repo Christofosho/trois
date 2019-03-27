@@ -151,18 +151,29 @@ h2.message {
     }
 }
 
+.options {
+    border: 5px outset black;
+    border-radius: 10px;
+    padding: 5px;
+    max-width: 400px;
+    min-width: 300px;
+    min-height: 200px;
+    background: rgba(208, 252, 255, 1);
+}
+
 .cards {
     flex-wrap: wrap;
     border: 5px outset black;
     border-radius: 10px;
     padding: 5px;
     max-width: 400px;
+    min-height: 200px;
     justify-content: flex-start;
     background: rgba(208, 252, 255, 1);
 }
 
 .card {
-    margin-bottom: 10px;
+    margin: 10px 0;
     flex-basis: 24%;
 }
 
@@ -186,14 +197,14 @@ h2.message {
 
 .players {
     min-width: 100px;
+    min-height: 200px;
     border: 5px outset black;
     border-radius: 10px;
     padding: 3px;
-    padding-bottom: 22px;
     background: rgba(208, 252, 255, 1);
 }
 
-.players-title {
+.players-title, .options-title {
     text-align: center;
     border-bottom: 1px solid black;
     margin: 0;

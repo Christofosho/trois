@@ -16,10 +16,10 @@ export default class Players extends React.Component {
                 />;
         });
         return (
-            <aside className="players">
+            <section className="players">
                 <h3 className="players-title">Players</h3>
                 {activePlayers}
-            </aside>
+            </section>
         );
     }
 }
