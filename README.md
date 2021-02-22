@@ -11,14 +11,19 @@ In the game of Trois, there are many groups of three. There are three different 
   Card 2: 3 Purple Filled Squares
   Card 3: 3 Purple Filled Circles
 
+## Dependencies
+1. Python (https://www.python.org/)
+2. Poetry (https://python-poetry.org/)
+3. npm (https://www.npmjs.com/)
+
 ## Installing
 1. Clone the repo.
-2. `cd trois`
-3. `virtualenv venv`
-4. Linux: `source venv/bin/activate` Windows: `venv\Scripts\activate`
-5. `pip install -r requirements.txt`
-6. `npm install`
+
+### Inside the repo:
+2. poetry install
+3. npm install
+4. npm run build
 
 ## Running
-1. In the project folder: `python trois.py`
-2. Navigate to `localhost:5000` on your browser.
+5. poetry run trois
+6. Visit localhost:8080 on your browser to play!
