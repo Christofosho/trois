@@ -12,10 +12,8 @@ from twisted.python import log
 from twisted.web.server import Site
 from twisted.web.static import File
 
-from trois.handler import Handler
+from handler import Handler
 
-env = Env()
-env.read_env()
 handler = Handler()
 
 
@@ -47,8 +45,10 @@ class ServerProtocol(WebSocketServerProtocol):
 
 def run_server():
     log.startLogging(sys.stdout)
+    env = Env()
+    env.read_env()
     location = u"{}127.0.0.1:8080".format(
-        "wss://" if env.int("SSL_ENABLED") == 1 else "ws://"
+        "wss://" if env.int("SSL_ENABLED", default=0) == 1 else "ws://"
     )
     factory = WebSocketServerFactory(location)
     factory.protocol = ServerProtocol
@@ -72,5 +72,5 @@ def run_server():
     reactor.run()
 
 
-if __name__ == "__main__":
+def main():
     run_server()

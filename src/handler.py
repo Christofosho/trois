@@ -1,9 +1,9 @@
 import logging
 
-from trois.message import Message
-from trois.room import Room
-from trois.user import User
-from trois.validator import Validator
+from message import Message
+from room import Room
+from user import User
+from validator import Validator
 
 
 class Handler():
