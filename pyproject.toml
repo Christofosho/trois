@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "trois"
+version = "0.1.0"
+description = "A rendition of a card matching game."
+authors = ["Chris <csnow@live.ca>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+autobahn = "^21.2.1"
+twisted = {path = "Twisted-20.3.0-cp39-cp39-win_amd64.whl"}
+environs = "^9.3.1"
+
+[tool.poetry.scripts]
+trois = "src.trois:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
