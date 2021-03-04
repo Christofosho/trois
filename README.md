@@ -1,6 +1,15 @@
 # Trois
 A matching game.
 
+# About This Project
+I set out to replicate a game that my wife, friends and I enjoy, called [Set](https://www.playmonster.com/product/set/).
+
+I changed around the symbols and threw in online connectivity so that we could all play together if we were missing a deck (or solo if anyone preferred).
+
+The goals of this project were simple:
+1. Experiment with a React frontend; and
+2. Experiment with alternative websocket and web server technologies in Python on the backend.
+
 ## How to play
 In the game of Trois, there are many groups of three. There are three different shapes, which come in three different counts, and can have three different fillings, and three different colours. Your goal is to match all but one feature, or to match none of the features, of three cards. Trois is the French word for "three".
 
