@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "trois"
-version = "0.1.0"
+version = "1.0.0"
 description = "A rendition of a card matching game."
 authors = []
 
 [tool.poetry.dependencies]
 python = "3.9.2"
 autobahn = "21.2.1"
-twisted = {path = "Twisted-20.3.0-cp39-cp39-win_amd64.whl"}
+twisted = "20.3.0"
 environs = "9.3.1"
 poetry = "^1.1.5"
 

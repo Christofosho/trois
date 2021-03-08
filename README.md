@@ -1,10 +1,10 @@
 # Trois
-A matching game.
+A card matching game made in ReactJS, where the differences are what matter.
 
 # About This Project
 I set out to replicate a game that my wife, friends and I enjoy, called [Set](https://www.playmonster.com/product/set/).
 
-I changed around the symbols and threw in online connectivity so that we could all play together if we were missing a deck (or solo if anyone preferred).
+I changed around the symbols and threw in online connectivity so that we could all play together if we were missing a Set deck (or play solo if anyone preferred).
 
 The goals of this project were simple:
 1. Experiment with a React frontend; and

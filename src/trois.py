@@ -1,5 +1,6 @@
 import json
 import sys
+import os
 
 from autobahn.twisted.resource import WebSocketResource
 from autobahn.twisted.websocket import WebSocketServerFactory
@@ -47,8 +48,9 @@ def run_server():
     log.startLogging(sys.stdout)
     env = Env()
     env.read_env()
-    location = u"{}127.0.0.1:8080".format(
-        "wss://" if env.int("SSL_ENABLED", default=0) == 1 else "ws://"
+    location = u"{}0.0.0.0:{}".format(
+        "wss://" if env.int("SSL_ENABLED", default=0) == 1 else "ws://",
+        os.environ.get("PORT", 8080)
     )
     factory = WebSocketServerFactory(location)
     factory.protocol = ServerProtocol

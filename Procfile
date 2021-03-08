@@ -1,1 +1,1 @@
-web: poetry run trois
+web: poetry install && poetry run trois
