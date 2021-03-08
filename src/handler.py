@@ -33,9 +33,12 @@ class Handler():
         """ Sends messages over websocket. """
         for message in self.messages:
             for r in message.recipients:
-                r.sendMessage(
-                    message.to_json_utf8()
-                )
+                try:
+                    r.sendMessage(
+                        message.to_json_utf8()
+                    )
+                except Exception as e:
+                    print(e)
         self.messages.clear()
 
     def distribute(self, client, payload):
@@ -110,18 +113,19 @@ class Handler():
                 user_id
             ))
             self.remove_user(user)
-            # TODO: Send an update if user was in _room_
-            self.messages.add(Message(
-                payload={
-                    'message_type': "unregister",
-                    'message': [
-                        "{} has disconnected.".format(name)
+
+            if room:
+                self.messages.add(Message(
+                    payload={
+                        'message_type': "unregister",
+                        'message': [
+                            "{} has disconnected.".format(name)
+                        ]
+                    },
+                    recipients=[
+                        p.socket_identifier for p in room.players.values()
                     ]
-                },
-                recipients=[
-                    p.socket_identifier for p in room.players.values()
-                ]
-            ))
+                ))
 
         elif message_type == "new_room":
             # Create a new room and add the user to it.
