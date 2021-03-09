@@ -48,12 +48,12 @@ def run_server():
     log.startLogging(sys.stdout)
     env = Env()
     env.read_env()
-    location = u"{}0.0.0.0:{}".format(
-        "wss://" if env.int("SSL_ENABLED", default=0) == 1 else "ws://",
-        os.environ.get("PORT", 8080)
-    )
+    location = "ws://127.0.0.1:8080"
+
     factory = WebSocketServerFactory(location)
     factory.protocol = ServerProtocol
+    factory.setProtocolOptions(autoPingInterval=5, autoPingTimeout=10, autoPingSize=20)
+
     resource = WebSocketResource(factory)
     root = File("./public/")
     root.putChild(b"ws", resource)
@@ -71,6 +71,7 @@ def run_server():
     handle.start(0.2)
 
     reactor.listenTCP(8080, site)
+
     reactor.run()
 
 
