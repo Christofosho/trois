@@ -52,7 +52,7 @@ def run_server():
 
     factory = WebSocketServerFactory(location)
     factory.protocol = ServerProtocol
-    factory.setProtocolOptions(autoPingInterval=5, autoPingTimeout=10, autoPingSize=20)
+    factory.setProtocolOptions(autoPingInterval=5, autoPingTimeout=60, autoPingSize=20)
 
     resource = WebSocketResource(factory)
     root = File("./public/")
