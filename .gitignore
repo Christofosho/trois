@@ -10,7 +10,6 @@ package-lock.json
 
 *.pyc
 
-.env
 *.pem
 *.log
 public/bundle.js
