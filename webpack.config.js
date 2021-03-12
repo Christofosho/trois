@@ -1,5 +1,5 @@
 const path = require('path');
-const dotenv = require('dotenv-webpack');
+//const dotenv = require('dotenv-webpack');
 
 module.exports = {
   devtool: 'eval-source-map',
@@ -9,9 +9,9 @@ module.exports = {
     path: path.resolve(__dirname, "public")
   },
   plugins: [
-    new dotenv()
+    //new dotenv()
   ],
-  mode: "development",
+  mode: "production",
   "module": {
     rules: [
       {
