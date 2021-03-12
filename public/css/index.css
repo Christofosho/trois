@@ -19,15 +19,19 @@ nav {
     border-bottom: 1px solid rgb(173, 173, 173);
 }
 
-nav  a {
+nav .instructions-toggle {
     padding: 0 10px;
     font-family: 'Roboto', sans-serif;
     font-size: 1.3em;
     color: rgb(240, 240, 240);
     line-height: 55px;
+    background: none;
+    border: 0;
+    text-decoration: underline;
+    cursor: pointer;
 }
 
-nav  a:hover {
+nav  .instructions-toggle:hover {
     color: rgb(210, 210, 243);
 }
 
@@ -88,11 +92,16 @@ main {
     justify-content: space-around;
 }
 
+.flex-center {
+    align-items: center;
+}
+
 .game {
     margin: 0 auto;
     padding: 10px;
     align-items: center;
     max-width: 740px;
+    width: 90vw;
 }
 
 .messages {
@@ -105,22 +114,27 @@ h2.message {
     font-size: 1.6em;
     font-weight: 700;
     margin-top: 0px;
-    margin-bottom: 10px;
     cursor: default;
 }
 
+@media(max-width: 650px) {
+    h2.message {
+        margin-bottom: 5px;
+    }
+    .messages {
+        margin-bottom: 5px;
+    }
+}
+
 .message {
-    color:rgb(90, 90, 90);
+    color:rgb(65, 65, 65);
     font-size: 1.4em;
 }
 
 .lobby {
-    display: flex;
-}
-
-.lobby hr {
     width: 100%;
-    margin: 16px 0;
+    max-width: 500px;
+    margin-top: 30px;
 }
 
 .new-room, .join-room-button {
@@ -135,27 +149,30 @@ h2.message {
 .new-room, .join-room-button, .start-room,
 .end-room, .leave-room, .draw-cards {
     height: 34px;
-    border: 1px solid rgb(110, 110, 110);
-    border-radius: 5px;
     padding: 0 4px;
     font-size: 1.2em;
     color: rgb(65, 65, 65);
+    border: none;
+    border-radius: 2px;
 }
 
 .new-room:active, .join-room-button:active, .start-room:active,
 .end-room:active, .leave-room:active, .draw-cards:active {
-    background: rgb(173, 173, 173);
+    border-bottom: 0;
+    border-right: 0;
+    border-top: 2px solid black;
+    border-left: 2px solid black;
 }
 
 .join-room-input {
-    width: 106px;
+    width: 108px;
     height: 34px;
     margin-bottom: 5px;
     padding: 4px;
-    border: 1px solid rgb(110, 110, 110);
-    border-radius: 5px;
-
+    border: none;
+    border-radius: 2px;
     font-size: 1.2em;
+    text-align: center;
 }
 
 .scene {
@@ -170,8 +187,6 @@ h2.message {
 }
 
 .options {
-    border: 1px solid rgb(110, 110, 110);
-    border-radius: 5px;
     padding: 5px;
     margin: 1px;
     max-width: 400px;
@@ -188,14 +203,18 @@ h2.message {
 
 .cards {
     flex-wrap: wrap;
-    border: 1px solid rgb(110, 110, 110);
-    border-radius: 5px;
     padding: 5px;
     margin: 1px;
     max-width: 400px;
     min-height: 200px;
     justify-content: flex-start;
     background: rgb(240, 240, 240);
+}
+
+@media(max-width: 650px) {
+    .cards {
+        padding: 0;
+    }
 }
 
 .card {
@@ -224,8 +243,6 @@ h2.message {
 .players {
     min-width: 100px;
     min-height: 200px;
-    border: 1px solid rgb(110, 110, 110);
-    border-radius: 5px;
     padding: 5px;
     margin: 1px;
     background: rgb(240, 240, 240);
@@ -276,10 +293,9 @@ h2.message {
     flex-direction: column;
     width: 60vw;
     max-width: 600px;
-    background: white;
-    border-radius: 5px;
-    padding: 10px;
+    padding: 10px 0 10px 10px;
     margin: 20px 0;
+    background: rgb(245, 245, 245);
 }
 
 @media(max-width: 650px) {
@@ -355,7 +371,7 @@ h2.message {
 
 .close {
     align-self: flex-start;
-    background: white;
+    background: rgb(245, 245, 245);
     border: none;
     text-decoration: underline;
     cursor: pointer;
