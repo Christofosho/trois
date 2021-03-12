@@ -9,7 +9,7 @@ export default class Options extends React.Component {
         return (
             <section className="options">
                 <h3 className="options-title">Options</h3>
-                <p>Coming soon!</p>
+                <p className="message center">Coming soon!</p>
             </section>
         );
     }
