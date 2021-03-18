@@ -3,6 +3,7 @@ import React from 'react';
 import Lobby from './lobby';
 import Message from './message';
 import Room from './room';
+import {modes} from './constants';
 
 import {socket} from '../index';
 
@@ -11,12 +12,12 @@ export default class Game extends React.Component {
         super(props);
         this.state = {
             user_id: -1,
-            mode: 0,
+            mode: modes.HOME,
             message: [
                 "Welcome to Trois",
                 "The game of shapes and matching three!"
             ],
-            room: {}
+            room: null
         };
 
         this.socketMessageHandler = this.socketMessageHandler.bind(this);
@@ -45,7 +46,7 @@ export default class Game extends React.Component {
         else if (data.message_type == "init_room") {
             if (!data.room.started) {
                 this.setState({
-                    mode: 1,
+                    mode: modes.LOBBY,
                     room: data.room
                 });
             }
@@ -54,7 +55,7 @@ export default class Game extends React.Component {
         else if (data.message_type == "start_room") {
             if (data.room.started) {
                 this.setState({
-                    mode: 2,
+                    mode: modes.PLAYING,
                     room: data.room
                 });
             }
@@ -68,8 +69,8 @@ export default class Game extends React.Component {
 
         else if (data.message_type == "leave_room") {
             this.setState({
-                mode: 0,
-                room: {}
+                mode: modes.HOME,
+                room: null
             });
         }
     }
@@ -87,7 +88,7 @@ export default class Game extends React.Component {
         return (
             <div className="game column">
                 <Message messages={this.state.message} />
-                {this.state.mode >= 1 ?
+                {this.state.mode >= modes.LOBBY ?
                     <Room mode={this.state.mode}
                         userId={this.state.user_id}
                         roomId={this.state.room.room_id}

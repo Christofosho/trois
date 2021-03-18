@@ -38,9 +38,7 @@ nav  .instructions-toggle:hover {
 h1 {
     font-size: 3em;
     margin: 0;
-    color: white;
     padding: 0 10px;
-    cursor: default;
 }
 
 h2 {
@@ -61,6 +59,11 @@ main {
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
+}
+
+.home {
+    text-decoration: none;
+    color: white;
 }
 
 .centered {

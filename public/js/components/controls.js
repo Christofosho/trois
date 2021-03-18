@@ -2,6 +2,8 @@ import React from 'react';
 
 import {socket} from '../index';
 
+import {modes} from './constants';
+
 export default class Controls extends React.Component {
     constructor (props) {
         super(props);
@@ -50,7 +52,7 @@ export default class Controls extends React.Component {
                 <button className="leave-room" onClick={this.leaveRoom}>
                     Leave
                 </button>
-                {this.props.mode === 1 ?
+                {this.props.mode === modes.LOBBY ?
                     <button className="start-room" onClick={this.startRoom}>
                         Start
                     </button>

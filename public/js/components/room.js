@@ -5,6 +5,8 @@ import Controls from './controls';
 import Options from './options';
 import Players from './players';
 
+import {modes} from './constants';
+
 export default class Room extends React.Component {
     constructor (props) {
         super(props);
@@ -14,7 +16,7 @@ export default class Room extends React.Component {
         return (
             <div className="room column">
                 <div className="scene justify">
-                    { this.props.mode >= 2 ?
+                    { this.props.mode >= modes.PLAYING ?
                     <Cards userId={this.props.userId}
                         roomId={this.props.roomId}
                         activeCards={this.props.activeCards} />
