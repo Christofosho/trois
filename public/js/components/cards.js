@@ -35,8 +35,7 @@ export default class Cards extends React.Component {
     }
 
     componentDidUpdate(pProps, pState) {
-        for (const i of this.state.selected_cards) {
-            const card = this.state.selected_cards[i];
+        for (const card of this.state.selected_cards) {
             if (!this.props.activeCards.includes(card)) {
                 this.setState((state) => ({
                     selected_cards: state.selected_cards.filter(c => c != card)
