@@ -157,6 +157,7 @@ h2.message {
     color: rgb(65, 65, 65);
     border: none;
     border-radius: 2px;
+    -webkit-appearance: none;
 }
 
 .new-room:active, .join-room-button:active, .start-room:active,
