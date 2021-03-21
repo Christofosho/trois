@@ -1,3 +1,4 @@
+import logging
 import json
 import sys
 import os
@@ -20,6 +21,7 @@ handler = Handler()
 
 class ServerProtocol(WebSocketServerProtocol):
     requests = []
+    logger = logging.getLogger('main')
 
     def onMessage(self, payload, isBinary):
         try:
@@ -34,7 +36,7 @@ class ServerProtocol(WebSocketServerProtocol):
             ])
 
         except Exception as e:
-            raise e
+            self.logger.error(e)
 
     def onClose(self, wasClean, code, reason):
         print("Removing user: {}".format(self.user_id))
@@ -52,7 +54,7 @@ def run_server():
 
     factory = WebSocketServerFactory(location)
     factory.protocol = ServerProtocol
-    factory.setProtocolOptions(autoPingInterval=5, autoPingTimeout=60, autoPingSize=20)
+    factory.setProtocolOptions(autoPingInterval=5, autoPingTimeout=60)
 
     resource = WebSocketResource(factory)
     root = File("./public/")

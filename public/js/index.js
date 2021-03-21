@@ -8,6 +8,13 @@ const socket = new WebSocket(
         : `ws://${document.domain}:8080/ws`
 );
 
+let heartbeat = () => {
+    if (!socket) return;
+    if (socket.readyState !== 1) return;
+    socket.send(JSON.stringify({message_type: "heartbeat"}));
+    setTimeout(heartbeat, 10000);
+};
+
 // Open
 socket.addEventListener('open', (event) => {
     ReactDOM.render(
@@ -18,16 +25,17 @@ socket.addEventListener('open', (event) => {
         message_type: "register"
     };
     socket.send(JSON.stringify(data));
+    heartbeat();
 });
 
 // Error
-socket.addEventListener('error', (event) => {
-
+socket.addEventListener('error', (data) => {
+    console.error(data);
 });
 
 // Close
-socket.addEventListener('close', (event) => {
-
+socket.addEventListener('close', (data) => {
+    console.log(data);
 });
 
 

@@ -69,6 +69,15 @@ class Handler():
             ))
             return
 
+        if message_type == "heartbeat":
+            self.messages.add(Message(
+                payload={
+                    'message_type': "heartbeat"
+                },
+                recipients=[client]
+            ))
+            return
+
         user_id = payload.get('user_id', None)
         if message_type == "register":
             # Register a user in the system.

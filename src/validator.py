@@ -9,7 +9,8 @@ class Validator():
         "draw_cards",
         "send_action",
         "end_room",
-        "leave_room"
+        "leave_room",
+        "heartbeat"
     ])
 
     def __init__(self, handler):
