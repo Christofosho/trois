@@ -151,17 +151,19 @@ h2.message {
 
 .new-room, .join-room-button, .start-room,
 .end-room, .leave-room, .draw-cards {
+    -webkit-appearance: none;
     height: 34px;
     padding: 0 4px;
     font-size: 1.2em;
     color: rgb(65, 65, 65);
     border: none;
     border-radius: 2px;
-    -webkit-appearance: none;
+    background-color: #f0f0f0;
 }
 
 .new-room:active, .join-room-button:active, .start-room:active,
 .end-room:active, .leave-room:active, .draw-cards:active {
+    -webkit-appearance: none;
     border-bottom: 0;
     border-right: 0;
     border-top: 2px solid black;
@@ -169,6 +171,7 @@ h2.message {
 }
 
 .join-room-input {
+    -webkit-appearance: none;
     width: 108px;
     height: 34px;
     margin-bottom: 5px;
