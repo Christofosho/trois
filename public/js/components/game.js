@@ -10,13 +10,16 @@ import {socket} from '../index';
 export default class Game extends React.Component {
     constructor(props) {
         super(props);
+
+        this.INIT_MESSAGE = [
+            "Welcome to Trois",
+            "The game of shapes and matching three!"
+        ];
+
         this.state = {
             user_id: -1,
             mode: modes.HOME,
-            message: [
-                "Welcome to Trois",
-                "The game of shapes and matching three!"
-            ],
+            message: this.INIT_MESSAGE,
             room: null
         };
 
@@ -70,6 +73,7 @@ export default class Game extends React.Component {
         else if (data.message_type == "leave_room") {
             this.setState({
                 mode: modes.HOME,
+                message: this.INIT_MESSAGE,
                 room: null
             });
         }
