@@ -98,6 +98,7 @@ export default class Game extends React.Component {
                         roomId={this.state.room.room_id}
                         players={this.state.room.players}
                         activeCards={this.state.room.active_cards}
+                        lastMatch={this.state.room.last_match}
                         drawCards={this.state.draw_cards}
                         endGame={this.state.end_game}
                     />

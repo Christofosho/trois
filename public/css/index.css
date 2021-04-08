@@ -184,13 +184,7 @@ h2.message {
 
 .scene {
     display: flex;
-    flex-direction: row;
-}
-
-@media(max-width: 650px) {
-    .scene {
-        flex-direction: column;
-    }
+    flex-direction: column;
 }
 
 .options {
@@ -247,10 +241,11 @@ h2.message {
     border: 2px;
 }
 
-.players {
-    min-width: 100px;
-    min-height: 200px;
+.players, .history {
+    flex-grow: 1;
+    min-height: 60px;
     padding: 5px;
+    padding-bottom: 15px;
     margin: 1px;
     background: rgb(240, 240, 240);
 }
@@ -273,6 +268,16 @@ h2.message {
 
 .player-name:after {
     content: ":";
+}
+
+.history {
+    min-height: 130px;
+}
+
+.history-title {
+    font-size: 1.0em;
+    color: rgb(30, 30, 30);
+    margin: 0;
 }
 
 .controls {

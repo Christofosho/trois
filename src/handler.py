@@ -518,6 +518,7 @@ class Handler():
 
             # Remove the three cards picked.
             room.remove_cards(cards)
+            room.update_last_match(cards)
             room.end_room.clear()
             room.draw_cards.clear()
             

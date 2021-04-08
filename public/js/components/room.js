@@ -2,6 +2,7 @@ import React from 'react';
 
 import Cards from './cards';
 import Controls from './controls';
+import History from './history';
 import Options from './options';
 import Players from './players';
 
@@ -21,8 +22,15 @@ export default class Room extends React.Component {
                         roomId={this.props.roomId}
                         activeCards={this.props.activeCards} />
                     : <Options/> }
-                    <Players players={this.props.players}
-                        userId={this.props.userId} />
+                    <aside className="row">
+                        <Players
+                            players={this.props.players}
+                            userId={this.props.userId} />
+                        { this.props.mode >= modes.PLAYING ?
+                        <History lastMatch={this.props.lastMatch} />
+                        : null
+                        }
+                    </aside>
                 </div>
                 <Controls mode={this.props.mode}
                     userId={this.props.userId}

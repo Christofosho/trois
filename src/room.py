@@ -21,6 +21,7 @@ class Room():
         self.deck = Deck()
         self.game_stage = 0
         self.active_cards = []
+        self.last_match = []
         self.started = False
         self.start_room = set()
         self.draw_cards = set()
@@ -35,6 +36,7 @@ class Room():
             self.deck.draw()
             for _ in range(12)
         ]
+        self.last_match = []
         self.start_room.clear()
         self.draw_cards.clear()
         self.end_room.clear()
@@ -72,6 +74,9 @@ class Room():
             if card[0] not in cards
         ]
 
+    def update_last_match(self, cards):
+        self.last_match = cards
+
     def room_complete(self):
         if (len(self.active_cards) == 0
                 and len(self.deck) == 0):
@@ -87,6 +92,7 @@ class Room():
             'room_id': self.room_id,
             'started': self.started,
             'players': self.get_users(),
+            'last_match': self.last_match,
             'draw_cards': list(self.draw_cards),
             'end_room': list(self.end_room),
             'active_cards': [
