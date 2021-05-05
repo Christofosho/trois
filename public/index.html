@@ -21,42 +21,41 @@
   </main>
   <section class="overlay hide">
     <div class="instructions">
-      <header>
-        <h2>Instructions</h2>
-        <button class="close">close</button>
+      <header class="instructions-header">
+        <h2 class="instructions-title">Instructions</h2>
+        <button class="instructions-close">Close</button>
       </header>
-      <div>
-        <h3>The Main Goal</h3>
+      <div class="instructions-content">
+        <h3 class="instructions-heading">The Main Goal</h3>
         <p>
           In Trois, you will determine whether there are
-          three cards in play that match. Each
-          of the compared traits must
-          be either all matching or all distinct.
+          three cards in play that form a set.
+        </p>
+        <p>          
+          You will judge the cards on 4 traits.
         </p>
         <p>
-          Your goal is to select three
-          cards based on their four traits:
-        </p>
-        <p>
-          <strong>SHAPE</strong> (Triangle, Rectangle, Oval),
-        </p>
-        <p>
-          <strong>COLOUR</strong> (Green, Orange, Purple),
-        </p>
-        <p>
-          <strong>COUNT</strong> (One, Two, Three),
-        </p>
-        <p>
-          <strong>FILL</strong> (Hollow, Shaded, Solid),
+          For each trait,
+          the 3 cards must be <em>all the same</em> or
+          they must be <em>all different</em>.
         </p>
 
-        <hr>
+        <hr class="instructions-hr">
 
-        <h3>Example One</h3>
+        <h3 class="instructions-heading">The Traits</h3>
+        <dl class="instructions-traits">
+          <dt>SHAPE:</dt><dd>Triangle, Rectangle, Oval</dd>
+          <dt>COLOUR:</dt><dd>Blue, Orange, Purple</dd>
+          <dt>COUNT:</dt><dd>One, Two, Three</dd>
+          <dt>FILL:</dt><dd>Hollow, Shaded, Solid</dd>
+        </dl>
+        </p>
+
+        <hr class="instructions-hr">
+
+        <h3 class="instructions-heading">Example 1</h3>
         <p>
-          The following three cards are a match,
-          because each of the four traits are
-          all matching or all distinct.
+          The following three cards are a set.
         </p>
         <div class="example-cards">
           <div class="example-card example-one-card-one"></div>
@@ -65,24 +64,22 @@
         </div>
         <div class="row">
           <div class="matching">
-            <h4>Matching</h4>
-            <p>Colour: Green.</p>
-            <p>Count: One.</p>
-            <p>Fill: Hollow.</p>
+            <h4>Matching:</h4>
+            <p>Colour -> Blue</p>
+            <p>Count -> One</p>
+            <p>Fill -> Hollow</p>
           </div>
           <div class="distinct">
-            <h4>Distinct</h4>
-            <p>Shape: All different.</p>
+            <h4>Distinct:</h4>
+            <p>Shape -> All different</p>
           </div>
         </div>
 
-        <hr>
+        <hr class="instructions-hr">
 
-        <h3>Example Two</h3>
+        <h3 class="instructions-heading">Example 2</h3>
         <p>
-          The following three cards are a match,
-          because each of the four traits are
-          all matching or all distinct.
+          The following three cards are a set.
         </p>
         <div class="example-cards">
           <div class="example-card example-two-card-one"></div>
@@ -91,24 +88,22 @@
         </div>
         <div class="row">
           <div class="matching">
-            <h4>Matching</h4>
-            <p>Colour: Green.</p>
+            <h4>Matching:</h4>
+            <p>Colour -> Blue</p>
           </div>
           <div class="distinct">
-            <h4>Distinct</h4>
-            <p>Fill: Hollow, Shaded, Solid.</p>
-            <p>Count: One, Two, and Three.</p>
-            <p>Shape: All different.</p>
+            <h4>Distinct:</h4>
+            <p>Fill -> Hollow, Shaded, Solid</p>
+            <p>Count -> One, Two, and Three</p>
+            <p>Shape -> Triangle, Square, Circle</p>
           </div>
         </div>
 
-        <hr>
+        <hr class="instructions-hr">
 
-        <h3>Example Three</h3>
+        <h3 class="instructions-heading">Example 3</h3>
         <p>
-          The following three cards are NOT a match,
-          because each of the four traits are NOT
-          all matching or all distinct.
+          The following three cards are <strong>NOT</strong> a set.
         </p>
         <div class="example-cards">
           <div class="example-card example-three-card-one"></div>
@@ -118,7 +113,7 @@
         <p>
           The Fill on each of the three cards
           is not distinct or matching. All three
-          cards must be distinct or matching on all
+          cards must be distinct or matching on <em>all</em>
           four traits in order to be accepted as a match.
         </p>
       </div>

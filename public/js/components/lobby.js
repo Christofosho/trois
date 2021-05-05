@@ -30,15 +30,16 @@ export default class Lobby extends React.Component {
     render() {
         return (
             <div className="lobby row flex-center justify">
-                <div>
-                    <button className="new-room" onClick={this.newRoom}>
-                        New Room
-                    </button>
-                </div>
                 <div className="column">
                     <input id="join" className="join-room-input"
                         type="textbox" placeholder="Room ID"></input>
                     <button className="join-room-button" onClick={this.joinRoom}>Join Room</button>
+                </div>
+                <div>OR</div>
+                <div>
+                    <button className="new-room" onClick={this.newRoom}>
+                        New Room
+                    </button>
                 </div>
             </div>
         );

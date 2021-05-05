@@ -38,15 +38,13 @@ socket.addEventListener('close', (data) => {
     console.log(data);
 });
 
-
-let overlay = document.querySelector('.overlay');
-let close = document.querySelector('.close');
+let close = document.querySelector('.instructions-close');
 let instructions_toggle = document.querySelector('.instructions-toggle');
 let overlay_toggle = (e) => {
     e.preventDefault();
-    overlay.classList.toggle('hide');
+    document.querySelector('.game').classList.toggle('hide');
+    document.querySelector('.overlay').classList.toggle('hide');
 };
-overlay.addEventListener('click', overlay_toggle);
 close.addEventListener('click', overlay_toggle);
 instructions_toggle.addEventListener('click', overlay_toggle);
 

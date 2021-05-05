@@ -8,7 +8,7 @@ export default class Card extends React.Component {
     render() {
         let val = this.props.cardData > -1 ? this.props.cardData : -1;
         let bg = ((this.props.cardData > -1) ? { 
-            background: `url(../img/shapes.png) no-repeat -${
+            background: `url(../img/shapes.webp) no-repeat -${
                 (this.props.cardData % 9) * 56}px -${
                 Math.floor(this.props.cardData / 9) * 89}px`
         } : {});

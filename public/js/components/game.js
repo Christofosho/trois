@@ -3,6 +3,7 @@ import React from 'react';
 import Lobby from './lobby';
 import Message from './message';
 import Room from './room';
+import Samples from "./samples";
 import {modes} from './constants';
 
 import {socket} from '../index';
@@ -90,19 +91,23 @@ export default class Game extends React.Component {
 
     render() {
         return (
-            <div className="game column">
-                <Message messages={this.state.message} />
-                {this.state.mode >= modes.LOBBY ?
-                    <Room mode={this.state.mode}
-                        userId={this.state.user_id}
-                        roomId={this.state.room.room_id}
-                        players={this.state.room.players}
-                        activeCards={this.state.room.active_cards}
-                        lastMatch={this.state.room.last_match}
-                        drawCards={this.state.draw_cards}
-                        endGame={this.state.end_game}
-                    />
-                    : <Lobby userId={this.state.user_id} />}
+            <div className="game">
+                <div className="game-top">
+                    <Message messages={this.state.message} />
+                </div>
+                <div className="game-bottom">
+                    {this.state.mode >= modes.LOBBY ?
+                        <Room mode={this.state.mode}
+                            userId={this.state.user_id}
+                            roomId={this.state.room.room_id}
+                            players={this.state.room.players}
+                            activeCards={this.state.room.active_cards}
+                            lastMatch={this.state.room.last_match}
+                            drawCards={this.state.draw_cards}
+                            endGame={this.state.end_game}
+                        />
+                        : <Lobby userId={this.state.user_id} />}
+                </div>
             </div>
         );
     }
