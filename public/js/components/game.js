@@ -3,7 +3,6 @@ import React from 'react';
 import Lobby from './lobby';
 import Message from './message';
 import Room from './room';
-import Samples from "./samples";
 import {modes} from './constants';
 
 import {socket} from '../index';
