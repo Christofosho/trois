@@ -4,7 +4,8 @@
   "description": "",
   "main": "webpack.config.js",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "watch": "npm-watch"
   },
   "author": "",
   "license": "ISC",
@@ -16,8 +17,17 @@
     "@babel/preset-env": "^7.3.1",
     "@babel/preset-react": "^7.0.0",
     "dotenv-webpack": "^6.0.0",
+    "npm-watch": "^0.9.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "^4.0.2"
+  },
+  "watch": {
+    "build": {
+      "patterns": [
+        "public/js"
+      ],
+      "extensions": "js,jsx"
+    }
   }
 }
