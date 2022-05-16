@@ -14,7 +14,7 @@ from twisted.python import log
 from twisted.web.server import Site
 from twisted.web.static import File
 
-from handler import Handler
+from src.handler import Handler
 
 handler = Handler()
 
@@ -57,7 +57,11 @@ def run_server():
     factory.setProtocolOptions(autoPingInterval=5, autoPingTimeout=60)
 
     resource = WebSocketResource(factory)
-    root = File("./public/")
+
+    # Root is / and we are in /server/ running `poetry run trois`
+    # TODO: This needs to be fixed, relative pathing is bad.
+    root = File("../client/public/")
+
     root.putChild(b"ws", resource)
     site = Site(root)
 

@@ -3,13 +3,20 @@ name = "trois"
 version = "1.0.0"
 description = "A rendition of a card matching game."
 authors = []
+packages = [
+  { include = "src" },
+]
 
 [tool.poetry.dependencies]
-python = "3.9.2"
+python = "3.10.2"
 autobahn = "21.2.1"
 twisted = "22.4.0"
 environs = "9.3.1"
-poetry = "^1.1.9"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.2"
+tox = "^3.25.0"
+tox-poetry = "^0.4.1"
 
 [tool.poetry.scripts]
 trois = "src.trois:main"

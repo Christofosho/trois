@@ -1,6 +1,6 @@
 import random
 import string
-from deck import Deck
+from src.deck import Deck
 
 
 class Room():

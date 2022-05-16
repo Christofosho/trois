@@ -28,11 +28,22 @@ In the game of Trois, there are many groups of three. There are three different 
 ## Installing
 1. Clone the repo.
 
-### Inside the repo:
-2. poetry install
-3. npm install
-4. npm run build
+### Client:
+2. Navigate into the client directory.
+3. `npm install`
+4. `npm run build`
 
-## Running
-5. poetry run trois
-6. Visit localhost:8080 on your browser to play!
+### Server:
+5. Navigate into the server directory.
+6. `poetry install`
+7. `poetry run trois`
+8. Server should be running at `localhost:8080`
+
+## Tests
+Frontend tests using Jest (https://jestjs.io/)
+
+Run: `npm test`
+
+Backend tests using Pytest (https://docs.pytest.org/en/7.1.x/) and Tox (https://pypi.org/project/tox/)
+
+Run: `poetry run tox`

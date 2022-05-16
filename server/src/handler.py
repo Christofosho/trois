@@ -1,9 +1,9 @@
 import logging
 
-from message import Message
-from room import Room
-from user import User
-from validator import Validator
+from src.message import Message
+from src.room import Room
+from src.user import User
+from src.validator import Validator
 
 
 class Handler():
