@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const path = require('path');
 
 module.exports = {
@@ -7,8 +8,9 @@ module.exports = {
     filename: "bundle.js",
     path: path.resolve(__dirname, "public")
   },
-  mode: "production",
-  "module": {
+  mode: "development",
+
+  module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
@@ -33,5 +35,10 @@ module.exports = {
         }
       }
     ]
-  }
+  },
+  plugins: [
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+    }),
+  ]
 }

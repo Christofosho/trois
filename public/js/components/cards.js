@@ -1,77 +1,58 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Card from './card';
 
-import {socket} from '../index';
+export default props => {
 
-export default class Cards extends React.Component {
-    constructor (props) {
-        super(props);
-        this.state = {
-            selected_cards: []
-        }
-        // this.addSelectedCard = this.addSelectedCard.bind(this);
-    }
+    const [selectedCards, setSelectedCards] = useState([]);
 
-    addSelectedCard(event, cardValue) {
-        event.preventDefault();
-        if (this.state.selected_cards.length == 3) {
+    const addSelectedCard = (e, cardValue) => {
+        e.preventDefault();
+        if (selectedCards.length == 3) {
             return;
         }
         else {
-            if (!this.state.selected_cards.includes(cardValue)) {
-                this.setState((state) => ({
-                    selected_cards: state.selected_cards
-                        .concat([cardValue])
-                }));
+            if (!selectedCards.includes(cardValue)) {
+                setSelectedCards(selectedCards.concat([cardValue]));
             }
             else {
-                this.setState((state) => ({
-                    selected_cards:
-                        state.selected_cards.filter(x => x !== cardValue)
-                }));
+                setSelectedCards(selectedCards.filter(x => x !== cardValue));
             }
         }
-    }
+    };
 
-    componentDidUpdate(pProps, pState) {
-        for (const card of this.state.selected_cards) {
-            if (!this.props.activeCards.includes(card)) {
-                this.setState((state) => ({
-                    selected_cards: state.selected_cards.filter(c => c != card)
-                }));
+    // Check props against state each update
+    useEffect(() => {
+        for (const card of selectedCards) {
+            if (!props.activeCards.includes(card)) {
+                setSelectedCards(selectedCards.filter(c => c != card));
             }
         }
-        if (pState.selected_cards.length !== this.state.selected_cards.length
-            && this.state.selected_cards.length == 3) {
-            socket.send(JSON.stringify({
+    });
+
+    // Only check state against itself if it has changed.
+    useEffect(() => {
+        if (selectedCards.length == 3) {
+            props.socket.send(JSON.stringify({
                 message_type: "send_action",
-                user_id: this.props.userId,
-                room_id: this.props.roomId,
-                cards: this.state.selected_cards
+                user_id: props.userId,
+                room_id: props.roomId,
+                cards: selectedCards
             }));
-            this.setState({
-                selected_cards: []
-            })
+            setSelectedCards([]);
         }
-    }
+    }, [selectedCards]);
 
-    render() {
-        let active = Object.entries(this.props.activeCards).map((val, i) => {
-            if (val[1] === null) return;
-            return <Card key={i}
-                cardData={val[1]}
-                onClick={(e) => this.addSelectedCard(e, val[1])}
-                selected={this.state.selected_cards
-                    .includes(val[1])
-                }
-            />;
-        });
-
-        return (
-            <section className="cards row">
-                {active}
-            </section>
-        );
-    }
+    return (
+        <section className="cards row">
+            {Object.entries(props.activeCards).map((val, i) => {
+                if (val[1] === null) return;
+                return <Card key={i}
+                    cardData={val[1]}
+                    onClick={(e) => addSelectedCard(e, val[1])}
+                    selected={selectedCards.includes(val[1])}
+                />;
+            })}
+        </section>
+    );
 }

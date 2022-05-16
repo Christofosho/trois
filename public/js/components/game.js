@@ -1,113 +1,89 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Lobby from './lobby';
 import Message from './message';
 import Room from './room';
 import {modes} from './constants';
 
-import {socket} from '../index';
+const INIT_MESSAGE = [
+    "Welcome to Trois",
+    "The game of shapes and matching three!"
+];
 
-export default class Game extends React.Component {
-    constructor(props) {
-        super(props);
+export default props => {
+    const [userId, setUserId] = useState(-1);
+    const [mode, setMode] = useState(modes.HOME);
+    const [message, setMessage] = useState(INIT_MESSAGE);
+    const [room, setRoom] = useState(null);
 
-        this.INIT_MESSAGE = [
-            "Welcome to Trois",
-            "The game of shapes and matching three!"
-        ];
-
-        this.state = {
-            user_id: -1,
-            mode: modes.HOME,
-            message: this.INIT_MESSAGE,
-            room: null
-        };
-
-        this.socketMessageHandler = this.socketMessageHandler.bind(this);
-    }
-
-    socketMessageHandler(event) {
+    const socketMessageHandler = e => {
         /* Handles responses from the server.
             Names of response types correlate to original
             request sent to the server.
         */
-        const data = JSON.parse(event.data);
+        const data = JSON.parse(e.data);
         if (data.message) {
-            this.setState({
-                message: data.message
-            });
+            setMessage(data.message);
         }
-
+    
         if (data.message_type == "register") {
             // Prior to joining a room, the user
             // is given an id for updates.
-            this.setState({
-                user_id: data.user_id
-            });
+            setUserId(data.user_id);
         }
-
+    
         else if (data.message_type == "init_room") {
             if (!data.room.started) {
-                this.setState({
-                    mode: modes.LOBBY,
-                    room: data.room
-                });
+                setMode(modes.LOBBY);
+                setRoom(data.room);
             }
         }
-
+    
         else if (data.message_type == "start_room") {
             if (data.room.started) {
-                this.setState({
-                    mode: modes.PLAYING,
-                    room: data.room
-                });
+                setMode(modes.PLAYING);
+                setRoom(data.room);
             }
         }
-
+    
         else if (data.message_type == "update_room") {
-            this.setState({
-                room: data.room
-            });
+            setRoom(data.room);
         }
-
+    
         else if (data.message_type == "leave_room") {
-            this.setState({
-                mode: modes.HOME,
-                message: this.INIT_MESSAGE,
-                room: null
-            });
+            setMode(modes.HOME);
+            setMessage(INIT_MESSAGE);
+            setRoom(null);
         }
-    }
+    };
 
-    componentDidMount() {
-        // Message
-        socket.addEventListener('message', this.socketMessageHandler);
-    }
+    useEffect(() => {
+        props.socket.addEventListener('message', socketMessageHandler);
+        return () => {
+            props.socket.removeEventListener('message', socketMessageHandler);
+        };
+    });
 
-    componentWillUnmount() {
-        socket.removeEventListener('message', this.socketMessageHandler);
-    }
-
-    render() {
-        return (
-            <div className="game">
-                <div className="game-top">
-                    <Message messages={this.state.message} />
-                </div>
-                <div className="game-bottom">
-                    {this.state.mode >= modes.LOBBY ?
-                        <Room mode={this.state.mode}
-                            userId={this.state.user_id}
-                            roomId={this.state.room.room_id}
-                            players={this.state.room.players}
-                            activeCards={this.state.room.active_cards}
-                            lastMatch={this.state.room.last_match}
-                            drawCards={this.state.draw_cards}
-                            endGame={this.state.end_game}
-                        />
-                        : <Lobby userId={this.state.user_id} />}
-                </div>
+    return (
+        <div className="game">
+            <div className="game-top">
+                <Message messages={message} />
             </div>
-        );
-    }
+            <div className="game-bottom">
+                {mode >= modes.LOBBY ?
+                    <Room
+                        socket={props.socket}
+                        mode={mode}
+                        userId={userId}
+                        roomId={room.room_id}
+                        players={room.players}
+                        activeCards={room.active_cards}
+                        lastMatch={room.last_match}
+                        /* drawCards={draw_cards}
+                         endGame={end_game} */
+                    />
+                    : <Lobby userId={userId} socket={props.socket} />}
+            </div>
+        </div>
+    );
 }
