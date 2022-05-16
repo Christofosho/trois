@@ -10,19 +10,20 @@ _valid_message_types = set([
     "draw_cards",
     "send_action",
     "end_room",
-    "leave_room"
+    "leave_room",
+    "heartbeat"
 ])
 
 
 @pytest.fixture(scope='module')
 def handler():
-    from trois.handler import Handler
+    from src.handler import Handler
     return Handler()
 
 
 @pytest.fixture(scope='module')
 def user(handler):
-    from trois.user import User
+    from src.user import User
 
     class FakeSocket():
         pass
@@ -32,13 +33,13 @@ def user(handler):
 
 @pytest.fixture(scope='module')
 def room(handler):
-    from trois.room import Room
+    from src.room import Room
     return Room(handler)
 
 
 @pytest.fixture(scope='module')
 def validator(handler):
-    from trois.validator import Validator
+    from src.validator import Validator
     return Validator(handler)
 
 
@@ -54,11 +55,11 @@ def test_validate_message_type(validator):
 
 
 def test_validate_user_id_invalid_None(validator):
-    assert validator.validate_user_id(None) is None
+    assert validator.validate_user_id(None) is False
 
 
 def test_validate_user_id_invalid_0(validator):
-    assert validator.validate_user_id(0) is None
+    assert validator.validate_user_id(0) is False
 
 
 def test_validate_user_id_valid(validator, user):
@@ -66,11 +67,11 @@ def test_validate_user_id_valid(validator, user):
 
 
 def test_validate_room_id_invalid_None(validator):
-    assert validator.validate_room_id(None) is None
+    assert validator.validate_room_id(None) is False
 
 
 def test_validate_room_id_invalid_0(validator):
-    assert validator.validate_room_id(0) is None
+    assert validator.validate_room_id(0) is False
 
 
 def test_validate_cards(validator, room):

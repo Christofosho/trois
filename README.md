@@ -44,6 +44,6 @@ Frontend tests using Jest (https://jestjs.io/)
 
 Run: `npm test`
 
-Backend tests using Pytest (https://docs.pytest.org/en/7.1.x/) and Tox (https://pypi.org/project/tox/)
+Backend tests using Pytest (https://docs.pytest.org/en/7.1.x/)
 
-Run: `poetry run tox`
+Run: `poetry run pytest`

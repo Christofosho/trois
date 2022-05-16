@@ -3,13 +3,13 @@ import pytest
 
 @pytest.fixture(scope='module')
 def handler():
-    from trois.handler import Handler
+    from src.handler import Handler
     return Handler()
 
 
 @pytest.fixture(scope='module')
 def user(handler):
-    from trois.user import User
+    from src.user import User
 
     class FakeSocket():
         pass
@@ -19,7 +19,7 @@ def user(handler):
 
 @pytest.fixture(scope='module')
 def room(handler):
-    from trois.room import Room
+    from src.room import Room
     return Room(handler)
 
 

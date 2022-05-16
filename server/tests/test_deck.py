@@ -3,7 +3,7 @@ import pytest
 
 @pytest.fixture(scope='module')
 def deck():
-    from trois.deck import Deck
+    from src.deck import Deck
     return Deck()
 
 
