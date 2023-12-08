@@ -10,7 +10,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "3.10.2"
 autobahn = "21.2.1"
-twisted = "22.10.0"
+twisted = "23.10.0"
 environs = "9.3.1"
 
 [tool.poetry.dev-dependencies]
